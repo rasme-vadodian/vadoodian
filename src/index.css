@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #002252;
+  --color-primary-container: #00377B;
+  --color-secondary: #BD8655;
+  --color-secondary-dark: #835428;
+  --color-secondary-light: #F8BA84;
+  --color-secondary-fixed: #FFDCC1;
+  --color-surface: #FFF8F4;
+  --color-surface-low: #FAF2EC;
+  --color-surface-card: #FFFFFF;
+  --color-surface-border: #EADBCE;
+  --color-text-main: #1E1B18;
+  --color-text-muted: #6E6B67;
+  --font-markazi: 'Markazi Text', serif;
+}
+
+@layer base {
+  *, ::before, ::after {
+    font-family: 'Markazi Text', serif;
+  }
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+    font-style: normal;
+    font-weight: normal;
+    font-display: swap;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+  }
+  /* Scrollbar aesthetics */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #FAF2EC;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #EADBCE;
+    border-radius: 4px;
+  }
+}

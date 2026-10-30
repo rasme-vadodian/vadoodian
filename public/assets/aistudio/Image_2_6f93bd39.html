@@ -1,0 +1,419 @@
+<!DOCTYPE html><html class="h-full bg-[#FFF8F4]" dir="rtl" lang="fa" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_dashboard" name="shell-type">
+<title>عملکرد ویترها و پرسنل - پنل مدیریت ودودیان</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00377B",
+            "primary-dark": "#002252",
+            secondary: "#BD8655",
+            "secondary-dark": "#835428",
+            "secondary-light": "#F8BA84",
+            surface: "#FFF8F4",
+            "surface-low": "#FAF2EC",
+            "surface-card": "#FFFFFF",
+            "surface-border": "#EADBCE",
+            "text-main": "#1E1B18",
+            "text-muted": "#6E6B67",
+            "brand-gold": "#FFDCC1"
+          },
+          fontFamily: {
+            markazi: ['"Markazi Text"', 'serif']
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    * {
+      font-family: 'Markazi Text', serif;
+    }
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined' !important;
+      font-display: swap;
+    }
+    input, select, button {
+      font-family: 'Markazi Text', serif;
+    }
+    /* Hide scrollbar while preserving scrollability */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF2EC;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #EADBCE;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="h-full bg-surface text-text-main flex overflow-hidden text-lg">
+<!-- Right Sidebar (Fixed RTL Sidebar) -->
+<aside class="w-64 bg-surface-low border-l border-surface-border flex flex-col justify-between h-full z-40 shrink-0 select-none shadow-sm">
+<!-- Top Part: Logo & Navigation -->
+<div class="flex flex-col">
+<!-- Brand Logo / Header -->
+<div class="h-20 px-6 flex items-center gap-3 border-b border-surface-border/70 bg-[#F4ECE6]">
+<div class="w-11 h-11 rounded-xl bg-primary flex items-center justify-center text-white shadow-sm ring-2 ring-secondary/30 shrink-0">
+<span class="material-symbols-outlined text-2xl text-secondary-light">local_cafe</span>
+</div>
+<div class="flex flex-col overflow-hidden">
+<span class="text-xl font-bold text-primary leading-tight truncate">کافه ودودیان</span>
+<span class="text-sm font-medium text-text-muted truncate">سامانه مدیریت و نظارت</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-1.5 p-4 mt-2">
+<!-- Tables and Orders -->
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-muted hover:bg-surface-border/50 hover:text-primary transition-all group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">table_restaurant</span>
+<span class="text-xl font-medium">میزها و سفارش‌ها</span>
+</a>
+<!-- Menu Management -->
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-muted hover:bg-surface-border/50 hover:text-primary transition-all group" href="#"><span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">receipt_long</span><span class="text-xl font-medium">فهرست سفارشات</span></a><a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-text-muted hover:bg-surface-border/50 hover:text-primary transition-all group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">restaurant_menu</span>
+<span class="text-xl font-medium">مدیریت منو و اقلام</span>
+</a>
+<!-- Staff Performance (Active) -->
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-primary text-[#FFF8F4] font-bold shadow-md shadow-primary/20 ring-1 ring-primary/30" href="#">
+<span class="material-symbols-outlined text-2xl text-secondary-light">badge</span>
+<span class="text-xl font-bold text-white tracking-wide">عملکرد ویترها و پرسنل</span>
+</a>
+<!-- Settings -->
+
+</nav>
+</div>
+<!-- Bottom Part: Admin Profile & Logout -->
+<div class="p-4 border-t border-surface-border/70 bg-[#F4ECE6]/60"><div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-card border border-surface-border shadow-xs">
+<div class="flex items-center gap-2.5 overflow-hidden">
+
+<div class="flex flex-col min-w-0">
+<span class="text-lg font-bold text-primary leading-tight truncate">مدیر کافه</span>
+<span class="text-xs text-text-muted">سطح دسترسی کل</span>
+</div>
+</div>
+<button class="p-1.5 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="خروج از حساب" type="button">
+<span class="material-symbols-outlined text-xl">logout</span>
+</button>
+</div></div>
+</aside>
+<!-- Main Container -->
+<div class="flex-1 flex flex-col h-full overflow-hidden bg-surface">
+<!-- Top Bar -->
+<header class="h-20 border-b border-surface-border bg-surface-card/90 backdrop-blur-md px-8 flex items-center justify-between shrink-0 z-30 shadow-xs">
+<!-- Right Side: Online Status & Date Time -->
+<div class="flex items-center gap-5">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-base font-semibold text-emerald-800 leading-none">سیستم برخط و متصل</span>
+</div>
+<div class="h-5 w-px bg-surface-border"></div>
+<div class="flex items-center gap-2 text-text-muted text-lg">
+<span class="material-symbols-outlined text-xl text-secondary">calendar_month</span>
+<span class="">امروز: ۱۸ فروردین ۱۴۰۳</span>
+<span class="mx-1">•</span>
+<span class="material-symbols-outlined text-xl text-secondary">schedule</span>
+<span class="">ساعت ۱۰:۳۰</span>
+</div>
+</div>
+<!-- Left Side: Notification & Current User Profile -->
+<div class="flex items-center gap-4">
+<!-- Notification Button -->
+<button class="relative p-2 text-text-muted hover:text-primary hover:bg-surface-low rounded-xl transition-colors border border-transparent hover:border-surface-border cursor-pointer" title="اعلان‌ها" type="button">
+<span class="material-symbols-outlined text-2xl">notifications</span>
+
+</button>
+<div class="h-6 w-px bg-surface-border"></div>
+<!-- Admin Info -->
+<div class="flex items-center gap-3">
+<div class="text-left hidden sm:flex flex-col items-end">
+<span class="text-lg font-bold text-primary leading-tight">پنل مدیریت ودودیان</span>
+<span class="text-xs text-text-muted">مدیر سیستم فعال</span>
+</div>
+
+</div>
+</div>
+</header>
+<!-- Scrollable Main Content -->
+<main class="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+<!-- Page Title & Quick Breadcrumb -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-surface-border/60 pb-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-2.5">
+<div class="w-2 h-7 bg-primary rounded-full"></div>
+<h1 class="text-3xl font-bold text-primary tracking-tight">عملکرد ویترها و پرسنل</h1>
+</div>
+<p class="text-text-muted text-lg mt-1 mr-4">
+            مدیریت وضعیت و دسترسی پرسنل و ویترهای سالن • ثبت سریع، ویرایش دسترسی‌ها و پین ورود
+          </p>
+</div>
+<div class="flex items-center gap-2 self-start sm:self-center">
+<span class="px-3.5 py-1 rounded-lg bg-surface-low border border-surface-border text-base text-primary font-bold">
+            پرسنل حاضر: ۴ نفر
+          </span>
+</div>
+</div>
+<!-- Section 1: Add / Edit Waiter Form Card -->
+<section class="bg-surface-card rounded-2xl border border-surface-border shadow-xs overflow-hidden">
+<!-- Form Header -->
+<div class="px-6 py-4 bg-surface-low border-b border-surface-border flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-2xl text-secondary">person_add</span>
+<h2 class="text-2xl font-bold text-primary" id="form-heading">ثبت ویتر جدید</h2>
+
+</div>
+
+</div>
+<!-- Form Body -->
+<form class="p-6 space-y-6" id="waiter-form" onsubmit="event.preventDefault();">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+<!-- Full Name -->
+<div class="flex flex-col gap-1.5">
+<label class="text-lg font-bold text-text-main flex items-center gap-1.5" for="waiter-name-input">
+<span class="material-symbols-outlined text-lg text-secondary">badge</span>
+                نام و نام خانوادگی
+              </label>
+<input class="w-full px-3.5 py-2 rounded-xl bg-surface-low/50 border border-surface-border text-xl text-text-main placeholder-text-muted/60 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="waiter-name-input" placeholder="مثال: امیرحسین رضایی" required="" type="text">
+</div>
+<!-- User ID / Code -->
+<div class="flex flex-col gap-1.5">
+<label class="text-lg font-bold text-text-main flex items-center gap-1.5" for="waiter-code-input">
+<span class="material-symbols-outlined text-lg text-secondary">tag</span>
+                کد کاربری / شناسه
+              </label>
+<input class="w-full px-3.5 py-2 text-center rounded-xl bg-surface-low/50 border border-surface-border text-xl font-bold text-primary placeholder-text-muted/60 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="waiter-code-input" placeholder="مثال: ۱۰۲۵" required="" type="text">
+</div>
+<!-- 4-digit PIN -->
+<div class="flex flex-col gap-1.5">
+<label class="text-lg font-bold text-text-main flex items-center gap-1.5" for="waiter-pin-input">
+<span class="material-symbols-outlined text-lg text-secondary">lock</span>
+                پین ورود (۴ رقم)
+              </label>
+<input class="w-full px-3.5 py-2 text-center tracking-widest rounded-xl bg-surface-low/50 border border-surface-border text-2xl font-bold text-primary placeholder-text-muted/60 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="waiter-pin-input" maxlength="4" placeholder="••••" required="" type="password">
+</div>
+<!-- Work Shift -->
+
+</div>
+<!-- Bottom Actions -->
+<div class="pt-4 border-t border-surface-border flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2 text-text-muted text-base">
+<span class="material-symbols-outlined text-lg text-secondary">info</span>
+<span class="">کد کاربری و پین چهاررقمی برای ورود پرسنل به اپلیکیشن سفارش‌گیر تبلت استفاده می‌شود.</span>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+
+<button class="flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xl font-bold shadow-md shadow-primary/20 transition-all cursor-pointer" type="submit">
+<span class="material-symbols-outlined text-xl">save</span>
+<span id="submit-btn-label" class="">ثبت ویتر جدید</span>
+</button>
+</div>
+</div>
+</form>
+</section>
+<!-- Section 2: Waiters List & Performance Table -->
+<section class="bg-surface-card rounded-2xl border border-surface-border shadow-xs overflow-hidden flex flex-col mb-8">
+<!-- Table Header Info -->
+<div class="px-6 py-4 bg-surface-low border-b border-surface-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-2xl text-primary">groups</span>
+<div>
+<h2 class="text-2xl font-bold text-primary leading-tight">فهرست و آمار عملکرد پرسنل</h2>
+
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-text-muted text-xl">search</span>
+
+</div>
+</div>
+</div>
+<!-- Table Container -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-right border-collapse">
+<thead>
+<tr class="bg-surface-low/80 text-primary border-b border-surface-border text-lg font-bold">
+<th class="py-3.5 px-6">نام و نام خانوادگی</th>
+<th class="py-3.5 px-4 text-center">کد کاربری</th>
+
+
+<th class="py-3.5 px-4 text-center">سفارش‌های ثبت‌شده</th>
+<th class="py-3.5 px-4 text-center">مجموع فروش (تومان)</th>
+<th class="py-3.5 px-4 text-center"><div class="inline-flex items-center gap-1"><span class="">پین ورود</span><span class="text-xs text-secondary font-medium font-normal">(ویرایش سریع)</span></div></th>
+<th class="py-3.5 px-6 text-center">عملیات</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-border text-text-main text-xl">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-low/40 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+
+<div class="flex flex-col">
+<span class="font-bold text-primary">علی رضایی</span>
+
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-bold text-primary text-xl">۱۰۲۱</td>
+
+
+<td class="py-4 px-4 text-center font-bold text-primary text-2xl">۴۴۳</td>
+<td class="py-4 px-4 text-center font-bold text-secondary-dark text-xl">
+                  ۱۴,۸۵۰,۰۰۰ <span class="text-sm text-text-muted font-normal">تومان</span>
+</td>
+<td class="py-4 px-4 text-center"><div class="inline-flex items-center gap-1.5 p-1 px-2 rounded-xl bg-surface-low/80 border border-surface-border shadow-xs hover:border-primary/40 transition-all"><span class="material-symbols-outlined text-base text-secondary">lock</span><input type="password" maxlength="4" value="4123" title="پین ۴ رقمی" class="w-16 h-8 text-center font-mono text-base font-bold text-primary tracking-widest bg-white border border-surface-border rounded-lg outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"><button type="button" onclick="const inp = this.previousElementSibling; const isPw = inp.type==='password'; inp.type = isPw ? 'text' : 'password'; this.querySelector('span').innerText = isPw ? 'visibility_off' : 'visibility';" class="p-1 text-text-muted hover:text-primary rounded-lg transition-colors cursor-pointer" title="نمایش / مخفی کردن پین"><span class="material-symbols-outlined text-lg leading-none">visibility</span></button><button type="button" onclick="const val = this.parentElement.querySelector('input').value; alert('پین علی رضایی با موفقیت به ' + val + ' تغییر یافت.');" class="p-1 text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors cursor-pointer" title="ذخیره پین جدید"><span class="material-symbols-outlined text-lg leading-none">check</span></button></div></td>
+<td class="py-4 px-6 text-center">
+<div class="flex items-center justify-center gap-2">
+<button class="p-2 rounded-xl text-primary hover:bg-primary/10 transition-colors cursor-pointer" onclick="editWaiter('علی رضایی', '۱۰۲۱', '4123', 'شیفت صبح (۰۸:۰۰ الی ۱۶:۰۰)')" title="ویرایش اطلاعات" type="button">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="p-2 rounded-xl text-text-muted hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer" title="حذف کاربر" type="button"><span class="material-symbols-outlined text-xl">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-low/40 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+
+<div class="flex flex-col">
+<span class="font-bold text-primary">سارا معتمد</span>
+
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-bold text-primary text-xl">۱۰۲۲</td>
+
+
+<td class="py-4 px-4 text-center font-bold text-primary text-2xl">۴۰۴</td>
+<td class="py-4 px-4 text-center font-bold text-secondary-dark text-xl">
+                  ۱۱,۲۰۰,۰۰۰ <span class="text-sm text-text-muted font-normal">تومان</span>
+</td>
+<td class="py-4 px-4 text-center"><div class="inline-flex items-center gap-1.5 p-1 px-2 rounded-xl bg-surface-low/80 border border-surface-border shadow-xs hover:border-primary/40 transition-all"><span class="material-symbols-outlined text-base text-secondary">lock</span><input type="password" maxlength="4" value="2201" title="پین ۴ رقمی" class="w-16 h-8 text-center font-mono text-base font-bold text-primary tracking-widest bg-white border border-surface-border rounded-lg outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"><button type="button" onclick="const inp = this.previousElementSibling; const isPw = inp.type==='password'; inp.type = isPw ? 'text' : 'password'; this.querySelector('span').innerText = isPw ? 'visibility_off' : 'visibility';" class="p-1 text-text-muted hover:text-primary rounded-lg transition-colors cursor-pointer" title="نمایش / مخفی کردن پین"><span class="material-symbols-outlined text-lg leading-none">visibility</span></button><button type="button" onclick="const val = this.parentElement.querySelector('input').value; alert('پین سارا معتمد با موفقیت به ' + val + ' تغییر یافت.');" class="p-1 text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors cursor-pointer" title="ذخیره پین جدید"><span class="material-symbols-outlined text-lg leading-none">check</span></button></div></td>
+<td class="py-4 px-6 text-center">
+<div class="flex items-center justify-center gap-2">
+<button class="p-2 rounded-xl text-primary hover:bg-primary/10 transition-colors cursor-pointer" onclick="editWaiter('سارا معتمد', '۱۰۲۲', '2201', 'شیفت عصر (۱۶:۰۰ الی ۲۴:۰۰)')" title="ویرایش اطلاعات" type="button">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="p-2 rounded-xl text-text-muted hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer" title="حذف کاربر" type="button"><span class="material-symbols-outlined text-xl">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-low/40 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+
+<div class="flex flex-col">
+<span class="font-bold text-primary">رضا کمالی</span>
+
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-bold text-primary text-xl">۱۰۲۳</td>
+
+
+<td class="py-4 px-4 text-center font-bold text-primary text-2xl">۳۲۲</td>
+<td class="py-4 px-4 text-center font-bold text-secondary-dark text-xl">
+                  ۹,۴۵۰,۰۰۰ <span class="text-sm text-text-muted font-normal">تومان</span>
+</td>
+<td class="py-4 px-4 text-center"><div class="inline-flex items-center gap-1.5 p-1 px-2 rounded-xl bg-surface-low/80 border border-surface-border shadow-xs hover:border-primary/40 transition-all"><span class="material-symbols-outlined text-base text-secondary">lock</span><input type="password" maxlength="4" value="7734" title="پین ۴ رقمی" class="w-16 h-8 text-center font-mono text-base font-bold text-primary tracking-widest bg-white border border-surface-border rounded-lg outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"><button type="button" onclick="const inp = this.previousElementSibling; const isPw = inp.type==='password'; inp.type = isPw ? 'text' : 'password'; this.querySelector('span').innerText = isPw ? 'visibility_off' : 'visibility';" class="p-1 text-text-muted hover:text-primary rounded-lg transition-colors cursor-pointer" title="نمایش / مخفی کردن پین"><span class="material-symbols-outlined text-lg leading-none">visibility</span></button><button type="button" onclick="const val = this.parentElement.querySelector('input').value; alert('پین رضا کمالی با موفقیت به ' + val + ' تغییر یافت.');" class="p-1 text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors cursor-pointer" title="ذخیره پین جدید"><span class="material-symbols-outlined text-lg leading-none">check</span></button></div></td>
+<td class="py-4 px-6 text-center">
+<div class="flex items-center justify-center gap-2">
+<button class="p-2 rounded-xl text-primary hover:bg-primary/10 transition-colors cursor-pointer" onclick="editWaiter('رضا کمالی', '۱۰۲۳', '7734', 'شیفت صبح (۰۸:۰۰ الی ۱۶:۰۰)')" title="ویرایش اطلاعات" type="button">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="p-2 rounded-xl text-text-muted hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer" title="حذف کاربر" type="button"><span class="material-symbols-outlined text-xl">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-low/40 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+
+<div class="flex flex-col">
+<span class="font-bold text-primary">مهدی صادقی</span>
+
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-bold text-primary text-xl">۱۰۲۴</td>
+
+
+<td class="py-4 px-4 text-center font-bold text-text-muted text-2xl">۱۸۵</td>
+<td class="py-4 px-4 text-center font-bold text-text-muted text-xl">
+                  ۴,۳۰۰,۰۰۰ <span class="text-sm text-text-muted font-normal">تومان</span>
+</td>
+<td class="py-4 px-4 text-center"><div class="inline-flex items-center gap-1.5 p-1 px-2 rounded-xl bg-surface-low/80 border border-surface-border shadow-xs hover:border-primary/40 transition-all"><span class="material-symbols-outlined text-base text-secondary">lock</span><input type="password" maxlength="4" value="9011" title="پین ۴ رقمی" class="w-16 h-8 text-center font-mono text-base font-bold text-primary tracking-widest bg-white border border-surface-border rounded-lg outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"><button type="button" onclick="const inp = this.previousElementSibling; const isPw = inp.type==='password'; inp.type = isPw ? 'text' : 'password'; this.querySelector('span').innerText = isPw ? 'visibility_off' : 'visibility';" class="p-1 text-text-muted hover:text-primary rounded-lg transition-colors cursor-pointer" title="نمایش / مخفی کردن پین"><span class="material-symbols-outlined text-lg leading-none">visibility</span></button><button type="button" onclick="const val = this.parentElement.querySelector('input').value; alert('پین مهدی صادقی با موفقیت به ' + val + ' تغییر یافت.');" class="p-1 text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors cursor-pointer" title="ذخیره پین جدید"><span class="material-symbols-outlined text-lg leading-none">check</span></button></div></td>
+<td class="py-4 px-6 text-center">
+<div class="flex items-center justify-center gap-2">
+<button class="p-2 rounded-xl text-primary hover:bg-primary/10 transition-colors cursor-pointer" onclick="editWaiter('مهدی صادقی', '۱۰۲۴', '9011', 'شیفت عصر (۱۶:۰۰ الی ۲۴:۰۰)')" title="ویرایش اطلاعات" type="button">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="p-2 rounded-xl text-text-muted hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer" title="حذف کاربر" type="button"><span class="material-symbols-outlined text-xl">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+<script>
+    function editWaiter(name, code, pin, shift) {
+      document.getElementById('waiter-name-input').value = name;
+      document.getElementById('waiter-code-input').value = code;
+      document.getElementById('waiter-pin-input').value = pin;
+      document.getElementById('waiter-shift-select').value = shift;
+      
+      document.getElementById('form-heading').innerText = 'ویرایش مشخصات ویتر: ' + name;
+      document.getElementById('form-status-tag').innerText = 'حالت: ویرایش پرسنل';
+      document.getElementById('form-status-tag').className = 'px-3 py-1 rounded-full text-sm font-semibold bg-amber-50 text-amber-800 border border-amber-300';
+      document.getElementById('submit-btn-label').innerText = 'ذخیره تغییرات ویتر';
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearWaiterForm() {
+      document.getElementById('waiter-name-input').value = '';
+      document.getElementById('waiter-code-input').value = '';
+      document.getElementById('waiter-pin-input').value = '';
+      document.getElementById('waiter-shift-select').selectedIndex = 0;
+      
+      document.getElementById('form-heading').innerText = 'ثبت ویتر جدید';
+      document.getElementById('form-status-tag').innerText = 'حالت: ثبت ویتر جدید';
+      document.getElementById('form-status-tag').className = 'px-3 py-1 rounded-full text-sm font-semibold bg-primary/10 text-primary border border-primary/20';
+      document.getElementById('submit-btn-label').innerText = 'ثبت ویتر جدید';
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

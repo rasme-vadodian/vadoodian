@@ -1,0 +1,6 @@
+{
+  "name": "کافه و موزه تاریخی ودودیان - Vadudian Cafe & Museum",
+  "description": "سامانه یکپارچه مانیتورینگ سالن، میزهای زنده، فاکتورها، مدیریت منو، عملکرد پرسنل و منوی دیجیتال مشتریان عمارت تاریخی ودودیان",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

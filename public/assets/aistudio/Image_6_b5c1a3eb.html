@@ -1,0 +1,485 @@
+<!DOCTYPE html><html dir="rtl" lang="fa" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;font-family:'Markazi Text','Plus Jakarta Sans',serif;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "background": "#fff8f4", "on-tertiary-fixed": "#00201d", "tertiary-fixed": "#7af6eb", "surface-dim": "#e0d9d3", "on-secondary": "#ffffff", "tertiary": "#002926", "outline-variant": "#c3c6d2", "on-primary-container": "#7fa3ed", "surface-bright": "#fff8f4", "on-background": "#1e1b18", "surface-container-low": "#faf2ec", "on-secondary-fixed-variant": "#673d12", "on-secondary-container": "#794c20", "secondary": "#835428", "on-tertiary-container": "#29b5ab", "surface-container-lowest": "#ffffff", "surface-variant": "#e9e1db", "surface": "#fff8f4", "tertiary-fixed-dim": "#5adacf", "on-surface-variant": "#434751", "on-primary-fixed-variant": "#194589", "on-secondary-fixed": "#2e1500", "surface-container": "#f4ece6", "on-primary-fixed": "#001a41", "surface-container-highest": "#e9e1db", "primary": "#002252", "secondary-container": "#febf89", "primary-fixed-dim": "#adc6ff", "surface-tint": "#365da2", "secondary-fixed": "#ffdcc1", "error": "#ba1a1a", "surface-container-high": "#efe7e1", "secondary-fixed-dim": "#f8ba84", "inverse-primary": "#adc6ff", "on-tertiary-fixed-variant": "#00504b", "on-primary": "#ffffff", "outline": "#747782", "primary-fixed": "#d8e2ff", "error-container": "#ffdad6", "tertiary-container": "#00413d", "primary-container": "#00377b", "on-tertiary": "#ffffff", "on-error": "#ffffff", "inverse-surface": "#33302c", "on-error-container": "#93000a", "inverse-on-surface": "#f7efe9", "on-surface": "#1e1b18" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xs": "0.25rem", "space-sm": "0.5rem", "space-xl": "2.25rem", "margin": "1rem", "space-lg": "1.5rem", "space-md": "1rem", "margin-desktop": "2.5rem", "gutter": "1rem", "gutter-desktop": "1.5rem" }, "fontFamily": { "label-sm": ["Plus Jakarta Sans"], "display": ["Noto Serif"], "price-lg": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "headline-md": ["Noto Serif"], "body-md": ["Plus Jakarta Sans"], "headline-lg": ["Noto Serif"], "title-lg": ["Plus Jakarta Sans"], "title-md": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"] }, "fontSize": { "label-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "500" }], "display": ["2.25rem", { "lineHeight": "3rem", "fontWeight": "700" }], "price-lg": ["1.125rem", { "lineHeight": "1.5rem", "fontWeight": "700" }], "label-lg": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "600" }], "headline-md": ["1.375rem", { "lineHeight": "2rem", "fontWeight": "600" }], "body-md": ["0.875rem", { "lineHeight": "1.5rem", "fontWeight": "400" }], "headline-lg": ["1.75rem", { "lineHeight": "2.5rem", "fontWeight": "600" }], "title-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "700" }], "title-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "600" }], "body-lg": ["1rem", { "lineHeight": "1.625rem", "fontWeight": "400" }] } } } };</script><link href="https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>body, h1, h2, h3, h4, h5, h6, p, span:not(.material-symbols-outlined), button:not(.material-symbols-outlined), a:not(.material-symbols-outlined), input, select, textarea, label, td, th { font-family: 'Markazi Text', serif !important; }</style></head><body class="bg-surface font-body-md text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container"><aside class="fixed right-0 top-0 h-full bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_4px_20px_-2px_rgba(189,134,85,0.08)]" style="width: 220px;"><div class="flex flex-col"><div class="px-space-md py-space-lg flex items-center gap-space-sm bg-surface-container-high/40"><img alt="Logo" class="w-10 h-10 rounded-full object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXU1DcGdTFvph_D33149-GkQF7vFWdL175NYQbWO9KoX2muPvAYLwQrsfF3sxLT5B7xfFkdKZ01DVeISr_aU5Lg_xLzmYEvyx1_7UMl3vxia7QVY1rM0fpZHXuofbg9XYTATp4usKGJ9BWcAJ8vijvCFfeKKXdeWnMrvbQQU6xxJ-nfM0VWQJFmJ3O2EVOb2AbDTwQ-ndRKdSyy6djJCRtPgm25ntmbEvyslOHja7GsvSmBHFrSJL62A"><div class="flex flex-col"><span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">کافه و موزه ودودیان</span><span class="font-label-sm text-label-sm text-secondary font-medium">پنل مدیریت عمارت تاریخی</span></div></div><div class="px-space-md py-space-sm"><span class="font-label-sm text-label-sm text-on-surface-variant font-bold px-space-xs">بخش‌های سامانه</span></div><nav class="flex flex-col gap-space-xs px-space-sm" data-active-classes="bg-primary text-on-primary shadow-sm font-semibold"><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="live-tables-orders" href="#"><span class="material-symbols-outlined text-xl">table_restaurant</span><span class="font-title-md text-title-md">میزهای زنده و سفارش‌ها</span></a><a data-path="orders-list" href="#" class="flex items-center gap-space-sm px-space-md py-space-sm rounded-xl bg-primary text-on-primary shadow-sm font-semibold transition-all"><span class="material-symbols-outlined text-xl">receipt_long</span><span class="font-title-md text-title-md">فهرست سفارشات&nbsp;</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="menu-inventory" href="#"><span class="material-symbols-outlined text-xl">restaurant_menu</span><span class="font-title-md text-title-md">مدیریت منو و اقلام</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="staff-waiters" href="#"><span class="material-symbols-outlined text-xl">badge</span><span class="font-title-md text-title-md">عملکرد ویترها و پرسنل</span></a></nav></div><div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/60 m-space-sm rounded-xl"><div class="flex items-center justify-between"></div><div class="flex items-center justify-between pt-space-xs"><div class="flex items-center gap-space-xs"><div class="flex flex-col"><span class="font-title-md text-title-md text-on-surface font-bold leading-tight">مدیر کافه</span><span class="font-label-sm text-label-sm text-secondary">سطح دسترسی کل</span></div></div><button class="p-space-xs text-error hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors" title="خروج از سیستم" type="button"><span class="material-symbols-outlined text-xl">logout</span></button></div></div></aside><div class="" style="padding-right: 220px;"><header class="fixed top-0 left-0 h-16 bg-surface/85 backdrop-blur-xl z-40 px-space-lg flex items-center justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]" style="right: 220px;"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs text-on-surface-variant bg-surface-container-high/60 px-space-sm py-1 rounded-lg"><span class="material-symbols-outlined text-lg text-secondary">calendar_today</span><span class="font-label-lg text-label-lg font-medium">پنج‌شنبه ۲۴ آبان ۱۴۰۳</span></div><div class="flex items-center gap-space-xs text-on-surface-variant bg-surface-container-high/60 px-space-sm py-1 rounded-lg"><span class="material-symbols-outlined text-lg text-secondary">schedule</span><span class="font-label-lg text-label-lg font-bold">۱۸:۴۵</span></div><button class="flex items-center gap-space-xs px-space-sm py-1 rounded-lg bg-surface-container-highest hover:bg-secondary-container hover:text-on-secondary-container text-on-surface font-label-lg text-label-lg transition-colors" type="button"><span class="material-symbols-outlined text-base">sync</span><span class="">بروزرسانی داده‌ها</span></button></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg bg-secondary-fixed/50 hover:bg-secondary-fixed text-on-secondary-fixed-variant transition-colors font-label-sm text-label-sm font-semibold" title="احضار و پیجر مهمانداران" type="button"><span class="material-symbols-outlined text-base text-secondary">campaign</span><span class="hidden sm:inline">احضار مهماندار</span></button><button class="relative p-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-full transition-colors" title="هشدارهای صوتی و سفارش" type="button"><span class="material-symbols-outlined text-2xl">notifications_active</span><span class="absolute top-1 right-1 w-2.5 h-2.5 bg-error rounded-full ring-2 ring-surface"></span></button><div class="flex items-center gap-space-xs bg-surface-container px-space-sm py-1 rounded-full"><span class="font-label-lg text-label-lg text-on-surface font-semibold pl-space-xs">امیرحسین ودودیان</span></div></div></header><main class="relative pt-16 bg-surface min-h-screen px-space-lg py-space-md"><div class="flex flex-col w-full gap-space-md">
+<!-- سطر کنترل‌ها و فیلترهای سریع بالا (متراکم و اداری) -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm bg-surface-container-lowest p-space-sm rounded-xl shadow-[0_2px_12px_-2px_rgba(189,134,85,0.08)]">
+<!-- فیلترهای وضعیت به عنوان تب‌های سریع فشرده -->
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+<button class="order-filter-btn flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg font-bold shadow-sm transition-all" data-filter="all" type="button">
+<span class="">همه فیش‌ها</span>
+<span class="inline-flex items-center justify-center bg-white/20 px-1.5 py-0.5 rounded-full text-xs font-mono">۲۴</span>
+</button>
+<button class="order-filter-btn flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors font-label-lg text-label-lg font-bold" data-filter="pending" type="button">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="">سفارش داده شده</span>
+<span class="inline-flex items-center justify-center bg-surface-variant px-1.5 py-0.5 rounded-full text-xs font-mono text-on-surface">۶</span>
+</button>
+<button class="order-filter-btn flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors font-label-lg text-label-lg font-bold" data-filter="delivered" type="button">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+<span class="">تحویل داده شده</span>
+<span class="inline-flex items-center justify-center bg-surface-variant px-1.5 py-0.5 rounded-full text-xs font-mono text-on-surface">۱۸</span>
+</button>
+</div>
+<!-- ابزار جستجو و اقدام سریع -->
+<div class="flex items-center gap-space-sm">
+<div class="relative flex-1 sm:w-72">
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline text-lg pointer-events-none">search</span>
+<input class="w-full bg-surface-container-low text-on-surface text-body-md font-body-md pr-9 pl-3 py-1.5 rounded-lg outline-none focus:bg-surface-container-lowest transition-colors placeholder:text-outline" id="order-search-input" placeholder="جستجوی شماره فیش یا میز..." type="text">
+</div>
+<button class="flex items-center gap-1 px-3 py-1.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-lg font-label-sm text-label-sm font-semibold transition-colors shrink-0" id="refresh-table-btn" title="بازخوانی زنده" type="button">
+<span class="material-symbols-outlined text-base">refresh</span>
+<span class="">تازه‌سازی</span>
+</button>
+</div>
+</div>
+<!-- جدول متراکم و فشرده سفارشات سالن و فیش‌ها -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(189,134,85,0.06)] overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-right border-collapse">
+<thead>
+<tr class="bg-surface-container-high/70 text-on-surface-variant font-label-lg text-label-lg font-bold select-none">
+<th class="py-2.5 px-3">شماره فیش</th>
+<th class="py-2.5 px-3">موقعیت میز</th>
+<th class="py-2.5 px-3">مهماندار / ویتر</th>
+
+<th class="py-2.5 px-3">خلاصه اقلام فاکتور</th>
+<th class="py-2.5 px-3 text-left">مبلغ کل (تومان)</th>
+
+<th class="py-2.5 px-3 text-center w-28">عملیات</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-highest/60 font-body-md text-body-md text-on-surface" id="orders-table-body">
+<!-- سطر ۱: در حال انتظار / سفارش داده شده -->
+<tr class="hover:bg-surface-container-low/80 transition-colors order-row" data-receipt="۸۸۴۲" data-status="pending" data-table="۴">
+<td class="py-2.5 px-3 font-mono font-bold text-primary">#۸۸۴۲</td>
+<td class="py-2.5 px-3 font-title-md text-title-md font-bold text-on-surface">میز ۴</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">person</span>
+                علی رضایی
+              </span>
+</td>
+
+<td class="py-2.5 px-3">
+<span class="text-on-surface font-medium line-clamp-1" title="۲× اسپرسو دبل، ۱× کیک قاجاری، ۱× لاته دارچین">
+                ۲× اسپرسو دبل، ۱× کیک قاجاری، ۱× لاته دارچین
+              </span>
+</td>
+<td class="py-2.5 px-3 text-left font-price-lg text-price-lg font-bold text-primary">
+              ۴۳۵,۰۰۰
+            </td>
+
+<td class="py-2.5 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded text-primary hover:bg-primary/10 transition-colors" onclick="showInvoiceModal('۸۸۴۲', 'میز ۴', 'علی رضایی', '۴۳۵,۰۰۰ تومان', '۲× اسپرسو دبل، ۱× کیک قاجاری، ۱× لاته دارچین')" title="مشاهده فاکتور" type="button">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</button>
+<button class="p-1 rounded text-secondary hover:bg-secondary/10 transition-colors" onclick="quickPrint('۸۸۴۲')" title="چاپ فیش آشپزخانه" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- سطر ۲: در حال انتظار / سفارش داده شده -->
+<tr class="hover:bg-surface-container-low/80 transition-colors order-row" data-receipt="۸۸۴۱" data-status="pending" data-table="۱۲">
+<td class="py-2.5 px-3 font-mono font-bold text-primary">#۸۸۴۱</td>
+<td class="py-2.5 px-3 font-title-md text-title-md font-bold text-on-surface">میز ۱۲</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">person</span>
+                سارا معتمدی
+              </span>
+</td>
+
+<td class="py-2.5 px-3">
+<span class="text-on-surface font-medium line-clamp-1" title="۱× چای سنتی دمی، ۲× باقلوا پسته، ۱× شربت زعفران">
+                ۱× چای سنتی دمی، ۲× باقلوا پسته، ۱× شربت زعفران
+              </span>
+</td>
+<td class="py-2.5 px-3 text-left font-price-lg text-price-lg font-bold text-primary">
+              ۳۲۰,۰۰۰
+            </td>
+
+<td class="py-2.5 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded text-primary hover:bg-primary/10 transition-colors" onclick="showInvoiceModal('۸۸۴۱', 'میز ۱۲', 'سارا معتمدی', '۳۲۰,۰۰۰ تومان', '۱× چای سنتی دمی، ۲× باقلوا پسته، ۱× شربت زعفران')" title="مشاهده فاکتور" type="button">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</button>
+<button class="p-1 rounded text-secondary hover:bg-secondary/10 transition-colors" onclick="quickPrint('۸۸۴۱')" title="چاپ فیش آشپزخانه" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- سطر ۳: تحویل داده شده -->
+<tr class="hover:bg-surface-container-low/80 transition-colors order-row" data-receipt="۸۸۴۰" data-status="delivered" data-table="۱">
+<td class="py-2.5 px-3 font-mono font-bold text-primary">#۸۸۴۰</td>
+<td class="py-2.5 px-3 font-title-md text-title-md font-bold text-on-surface">میز ۱</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">person</span>
+                نیما فرهادی
+              </span>
+</td>
+
+<td class="py-2.5 px-3">
+<span class="text-on-surface font-medium line-clamp-1" title="۳× کاپوچینو، ۲× چیزکیک انار ودودیان">
+                ۳× کاپوچینو، ۲× چیزکیک انار ودودیان
+              </span>
+</td>
+<td class="py-2.5 px-3 text-left font-price-lg text-price-lg font-bold text-primary">
+              ۵۹۰,۰۰۰
+            </td>
+
+<td class="py-2.5 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded text-primary hover:bg-primary/10 transition-colors" onclick="showInvoiceModal('۸۸۴۰', 'میز ۱', 'نیما فرهادی', '۵۹۰,۰۰۰ تومان', '۳× کاپوچینو، ۲× چیزکیک انار ودودیان')" title="مشاهده فاکتور" type="button">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</button>
+<button class="p-1 rounded text-secondary hover:bg-secondary/10 transition-colors" onclick="quickPrint('۸۸۴۰')" title="چاپ مجدد فیش" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- سطر ۴: تحویل داده شده -->
+<tr class="hover:bg-surface-container-low/80 transition-colors order-row" data-receipt="۸۸۳۹" data-status="delivered" data-table="۸">
+<td class="py-2.5 px-3 font-mono font-bold text-primary">#۸۸۳۹</td>
+<td class="py-2.5 px-3 font-title-md text-title-md font-bold text-on-surface">میز ۸</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">person</span>
+                علی رضایی
+              </span>
+</td>
+
+<td class="py-2.5 px-3">
+<span class="text-on-surface font-medium line-clamp-1" title="۱× املت سنتی قاجار، ۱× نان سنگک کنجدی، ۲× چای قندپهلو">
+                ۱× املت سنتی قاجار، ۱× نان سنگک کنجدی، ۲× چای قندپهلو
+              </span>
+</td>
+<td class="py-2.5 px-3 text-left font-price-lg text-price-lg font-bold text-primary">
+              ۲۸۵,۰۰۰
+            </td>
+
+<td class="py-2.5 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded text-primary hover:bg-primary/10 transition-colors" onclick="showInvoiceModal('۸۸۳۹', 'میز ۸', 'علی رضایی', '۲۸۵,۰۰۰ تومان', '۱× املت سنتی قاجار، ۱× نان سنگک کنجدی، ۲× چای قندپهلو')" title="مشاهده فاکتور" type="button">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</button>
+<button class="p-1 rounded text-secondary hover:bg-secondary/10 transition-colors" onclick="quickPrint('۸۸۳۹')" title="چاپ مجدد فیش" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- سطر ۵: در حال انتظار / سفارش داده شده -->
+<tr class="hover:bg-surface-container-low/80 transition-colors order-row" data-receipt="۸۸۳۸" data-status="pending" data-table="۶">
+<td class="py-2.5 px-3 font-mono font-bold text-primary">#۸۸۳۸</td>
+<td class="py-2.5 px-3 font-title-md text-title-md font-bold text-on-surface">میز ۶</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">person</span>
+                سارا معتمدی
+              </span>
+</td>
+
+<td class="py-2.5 px-3">
+<span class="text-on-surface font-medium line-clamp-1" title="۴× دمنوش بهارنارنج، ۱× حلوا زعفرانی تبریز">
+                ۴× دمنوش بهارنارنج، ۱× حلوا زعفرانی تبریز
+              </span>
+</td>
+<td class="py-2.5 px-3 text-left font-price-lg text-price-lg font-bold text-primary">
+              ۴۱۰,۰۰۰
+            </td>
+
+<td class="py-2.5 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded text-primary hover:bg-primary/10 transition-colors" onclick="showInvoiceModal('۸۸۳۸', 'میز ۶', 'سارا معتمدی', '۴۱۰,۰۰۰ تومان', '۴× دمنوش بهارنارنج، ۱× حلوا زعفرانی تبریز')" title="مشاهده فاکتور" type="button">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</button>
+<button class="p-1 rounded text-secondary hover:bg-secondary/10 transition-colors" onclick="quickPrint('۸۸۳۸')" title="چاپ فیش آشپزخانه" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- سطر ۶: تحویل داده شده -->
+<tr class="hover:bg-surface-container-low/80 transition-colors order-row" data-receipt="۸۸۳۷" data-status="delivered" data-table="۱۵">
+<td class="py-2.5 px-3 font-mono font-bold text-primary">#۸۸۳۷</td>
+<td class="py-2.5 px-3 font-title-md text-title-md font-bold text-on-surface">میز ۱۵</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">person</span>
+                نیما فرهادی
+              </span>
+</td>
+
+<td class="py-2.5 px-3">
+<span class="text-on-surface font-medium line-clamp-1" title="۲× قهوه فرانسه، ۲× کروسان پسته و هل">
+                ۲× قهوه فرانسه، ۲× کروسان پسته و هل
+              </span>
+</td>
+<td class="py-2.5 px-3 text-left font-price-lg text-price-lg font-bold text-primary">
+              ۳۴۰,۰۰۰
+            </td>
+
+<td class="py-2.5 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded text-primary hover:bg-primary/10 transition-colors" onclick="showInvoiceModal('۸۸۳۷', 'میز ۱۵', 'نیما فرهادی', '۳۴۰,۰۰۰ تومان', '۲× قهوه فرانسه، ۲× کروسان پسته و هل')" title="مشاهده فاکتور" type="button">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</button>
+<button class="p-1 rounded text-secondary hover:bg-secondary/10 transition-colors" onclick="quickPrint('۸۸۳۷')" title="چاپ مجدد فیش" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- سطر ۷: تحویل داده شده -->
+<tr class="hover:bg-surface-container-low/80 transition-colors order-row" data-receipt="۸۸۳۶" data-status="delivered" data-table="۳">
+<td class="py-2.5 px-3 font-mono font-bold text-primary">#۸۸۳۶</td>
+<td class="py-2.5 px-3 font-title-md text-title-md font-bold text-on-surface">میز ۳</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">person</span>
+                علی رضایی
+              </span>
+</td>
+
+<td class="py-2.5 px-3">
+<span class="text-on-surface font-medium line-clamp-1" title="۱× کلدبرو زعفرانی، ۱× تارت توت‌فرنگی و گلاب">
+                ۱× کلدبرو زعفرانی، ۱× تارت توت‌فرنگی و گلاب
+              </span>
+</td>
+<td class="py-2.5 px-3 text-left font-price-lg text-price-lg font-bold text-primary">
+              ۲۱۰,۰۰۰
+            </td>
+
+<td class="py-2.5 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded text-primary hover:bg-primary/10 transition-colors" onclick="showInvoiceModal('۸۸۳۶', 'میز ۳', 'علی رضایی', '۲۱۰,۰۰۰ تومان', '۱× کلدبرو زعفرانی، ۱× تارت توت‌فرنگی و گلاب')" title="مشاهده فاکتور" type="button">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</button>
+<button class="p-1 rounded text-secondary hover:bg-secondary/10 transition-colors" onclick="quickPrint('۸۸۳۶')" title="چاپ مجدد فیش" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- سطر ۸: تحویل داده شده -->
+<tr class="hover:bg-surface-container-low/80 transition-colors order-row" data-receipt="۸۸۳۵" data-status="delivered" data-table="۷">
+<td class="py-2.5 px-3 font-mono font-bold text-primary">#۸۸۳۵</td>
+<td class="py-2.5 px-3 font-title-md text-title-md font-bold text-on-surface">میز ۷</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">person</span>
+                سارا معتمدی
+              </span>
+</td>
+
+<td class="py-2.5 px-3">
+<span class="text-on-surface font-medium line-clamp-1" title="۲× آمریکانو، ۲× براونی گردویی داغ">
+                ۲× آمریکانو، ۲× براونی گردویی داغ
+              </span>
+</td>
+<td class="py-2.5 px-3 text-left font-price-lg text-price-lg font-bold text-primary">
+              ۲۶۰,۰۰۰
+            </td>
+
+<td class="py-2.5 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded text-primary hover:bg-primary/10 transition-colors" onclick="showInvoiceModal('۸۸۳۵', 'میز ۷', 'سارا معتمدی', '۲۶۰,۰۰۰ تومان', '۲× آمریکانو، ۲× براونی گردویی داغ')" title="مشاهده فاکتور" type="button">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</button>
+<button class="p-1 rounded text-secondary hover:bg-secondary/10 transition-colors" onclick="quickPrint('۸۸۳۵')" title="چاپ مجدد فیش" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- فوتر جدول: خلاصه‌سازی متراکم سطرها و شمارنده بدون اتلاف فضا -->
+<div class="px-space-md py-2.5 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between text-on-surface-variant text-label-sm font-label-sm gap-2">
+<div class="flex items-center gap-space-sm font-medium">
+<span class="">نمایش ۸ سفارش اخیر از کل ۲۴ فیش ثبت‌شده امروز</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="text-primary font-bold">مجموع فاکتورهای نمایش‌یافته: ۲,۴۴۰,۰۰۰ تومان</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2 py-1 bg-surface-container-highest hover:bg-surface-variant text-on-surface rounded font-mono disabled:opacity-50" disabled="" type="button">قبلی</button>
+<span class="px-2 py-1 bg-primary text-on-primary font-mono rounded font-bold">۱</span>
+<button class="px-2 py-1 bg-surface-container-highest hover:bg-surface-variant text-on-surface rounded font-mono" type="button">۲</button>
+<button class="px-2 py-1 bg-surface-container-highest hover:bg-surface-variant text-on-surface rounded font-mono" type="button">۳</button>
+<button class="px-2 py-1 bg-surface-container-highest hover:bg-surface-variant text-on-surface rounded font-mono" type="button">بعدی</button>
+</div>
+</div>
+</div>
+<!-- مودال ساده و متمرکز «مشاهده فاکتور» (کامپوننت اداری بدون حاشیه) -->
+<div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4" id="invoice-modal-overlay">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_16px_36px_-6px_rgba(0,55,123,0.22)] w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+<div class="bg-primary text-on-primary px-space-md py-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xl">receipt</span>
+<span class="font-title-md text-title-md font-bold">جزئیات فاکتور شماره <span id="modal-receipt-id"></span></span>
+</div>
+<button class="text-on-primary hover:bg-white/10 rounded-lg p-1 transition-colors" onclick="closeInvoiceModal()" type="button">
+<span class="material-symbols-outlined text-lg">close</span>
+</button>
+</div>
+<div class="p-space-md flex flex-col gap-space-sm font-body-md text-body-md text-on-surface">
+<div class="flex justify-between items-center py-1 bg-surface-container-low px-2 rounded">
+<span class="text-on-surface-variant">موقعیت سالن:</span>
+<span class="font-bold text-primary" id="modal-table-num"></span>
+</div>
+<div class="flex justify-between items-center py-1 bg-surface-container-low px-2 rounded">
+<span class="text-on-surface-variant">ویتر ثبت‌کننده:</span>
+<span class="font-bold text-on-surface" id="modal-waiter-name"></span>
+</div>
+<div class="flex flex-col gap-1 py-1">
+<span class="text-on-surface-variant font-bold text-label-sm">اقلام سفارشی ثبت‌شده:</span>
+<div class="p-2.5 bg-surface-container rounded-lg text-sm leading-relaxed text-on-surface" id="modal-items-list"></div>
+</div>
+<div class="flex justify-between items-center pt-2 mt-1">
+<span class="font-bold text-on-surface">مبلغ کل قابل پرداخت:</span>
+<span class="font-price-lg text-price-lg font-bold text-primary" id="modal-total-price"></span>
+</div>
+</div>
+<div class="p-space-sm bg-surface-container-low flex items-center justify-end gap-2">
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface font-label-lg text-label-lg font-bold hover:bg-surface-variant transition-colors" onclick="closeInvoiceModal()" type="button">
+          بستن
+        </button>
+<button class="flex items-center gap-1 px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg font-bold hover:bg-primary-container transition-colors" id="modal-print-btn" type="button">
+<span class="material-symbols-outlined text-base">print</span>
+<span class="">چاپ رسمی فاکتور</span>
+</button>
+</div>
+</div>
+</div>
+<!-- اسکریپت عملکرد سایدبار دسکتاپ و فیلترهای درون صفحه‌ای -->
+<script>
+    (function initOrdersDashboard() {
+      // تنظیم سایدبار برای فعال‌سازی آیتم «فهرست سفارشات» بدون دستکاری ساختار عمومی
+      const navContainer = document.querySelector('aside nav');
+      if (navContainer) {
+        // ایجاد یا بررسی لینک فهرست سفارشات
+        let ordersNavLink = navContainer.querySelector('[data-path="orders-list"]');
+        if (!ordersNavLink) {
+          // درج لینک جدید در جایگاه مشخص‌شده بین میزها و منو
+          ordersNavLink = document.createElement('a');
+          ordersNavLink.setAttribute('data-path', 'orders-list');
+          ordersNavLink.setAttribute('href', '#');
+          ordersNavLink.className = 'flex items-center gap-space-sm px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all';
+          ordersNavLink.innerHTML = '<span class="material-symbols-outlined text-xl">receipt_long</span><span class="font-title-md text-title-md">فهرست سفارشات (فیش‌ها)</span>';
+          
+          const tablesLink = navContainer.querySelector('[data-path="live-tables-orders"]');
+          if (tablesLink && tablesLink.nextSibling) {
+            navContainer.insertBefore(ordersNavLink, tablesLink.nextSibling);
+          } else {
+            navContainer.appendChild(ordersNavLink);
+          }
+        }
+
+        // علامت‌گذاری وضعیت انتخاب فعال روی فهرست سفارشات
+        const activeClass = 'bg-primary text-on-primary shadow-sm font-semibold';
+        const defaultClass = 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface';
+        
+        navContainer.querySelectorAll('a').forEach(link => {
+          link.className = 'flex items-center gap-space-sm px-space-md py-space-sm rounded-xl ' + defaultClass + ' transition-all';
+        });
+
+        ordersNavLink.className = 'flex items-center gap-space-sm px-space-md py-space-sm rounded-xl ' + activeClass + ' transition-all';
+      }
+
+      // فیلترهای تب وضعیت
+      const filterButtons = document.querySelectorAll('.order-filter-btn');
+      const orderRows = document.querySelectorAll('.order-row');
+      const searchInput = document.getElementById('order-search-input');
+
+      function applyFilters() {
+        const activeTab = document.querySelector('.order-filter-btn.bg-primary')?.getAttribute('data-filter') || 'all';
+        const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+        orderRows.forEach(row => {
+          const rowStatus = row.getAttribute('data-status');
+          const receiptText = row.getAttribute('data-receipt') || '';
+          const tableText = row.getAttribute('data-table') || '';
+          
+          const matchesStatus = (activeTab === 'all') || (rowStatus === activeTab);
+          const matchesSearch = !searchTerm || 
+            receiptText.includes(searchTerm) || 
+            tableText.includes(searchTerm) ||
+            row.textContent.toLowerCase().includes(searchTerm);
+
+          if (matchesStatus && matchesSearch) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          filterButtons.forEach(b => {
+            b.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+            b.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+          });
+          this.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+          this.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+          applyFilters();
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+      }
+
+      const refreshBtn = document.getElementById('refresh-table-btn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+          const icon = this.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.classList.add('animate-spin');
+            setTimeout(() => icon.classList.remove('animate-spin'), 600);
+          }
+        });
+      }
+    })();
+
+    // باز کردن و بستن مودال مشاهده فاکتور
+    window.showInvoiceModal = function(receiptId, tableNum, waiter, price, items) {
+      document.getElementById('modal-receipt-id').textContent = receiptId;
+      document.getElementById('modal-table-num').textContent = tableNum;
+      document.getElementById('modal-waiter-name').textContent = waiter;
+      document.getElementById('modal-total-price').textContent = price;
+      document.getElementById('modal-items-list').textContent = items;
+      
+      const modal = document.getElementById('invoice-modal-overlay');
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+    };
+
+    window.closeInvoiceModal = function() {
+      const modal = document.getElementById('invoice-modal-overlay');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    };
+
+    window.quickPrint = function(receiptId) {
+      // شبیه‌سازی چاپ فیش حرارتی بدون اضافه کردن پنجره مزاحم
+      const btn = event.currentTarget;
+      const originalIcon = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined text-lg text-primary animate-pulse">sync</span>';
+      setTimeout(() => {
+        btn.innerHTML = originalIcon;
+      }, 500);
+    };
+  </script>
+</div></main></div>
+
+
+</body></html>
