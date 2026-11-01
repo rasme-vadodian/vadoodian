@@ -23,11 +23,6 @@ export type CustomerView =
   | 'customer_quick_grid'
   | 'customer_item_detail';
 
-interface CustomerCartItem {
-  productId: string;
-  quantity: number;
-}
-
 interface AppContextType {
   mode: AppMode;
   setMode: (mode: AppMode) => void;
@@ -91,11 +86,6 @@ interface AppContextType {
   cancelOrder: (orderId: string) => void;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
 
-  // Customer Cart / Table Tray
-  customerCart: { [productId: string]: number };
-  updateCustomerCart: (productId: string, delta: number) => void;
-  clearCustomerCart: () => void;
-
   // Toast
   toast: { title: string; message: string } | null;
   showToast: (title: string, message: string) => void;
@@ -155,33 +145,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [orderConfirmModalOpen, setOrderConfirmModalOpen] = useState(false);
   const [quickInvoiceOrder, setQuickInvoiceOrder] = useState<Order | null>(null);
   const [callWaiterModalOpen, setCallWaiterModalOpen] = useState(false);
-
-  // Customer Cart / Table Tray
-  const [customerCart, setCustomerCart] = useState<{ [productId: string]: number }>(() => {
-    const saved = localStorage.getItem('vadudian_customer_cart');
-    return saved ? JSON.parse(saved) : {};
-  });
-
-  useEffect(() => {
-    localStorage.setItem('vadudian_customer_cart', JSON.stringify(customerCart));
-  }, [customerCart]);
-
-  const updateCustomerCart = (productId: string, delta: number) => {
-    setCustomerCart((prev) => {
-      const current = prev[productId] || 0;
-      const next = Math.max(0, current + delta);
-      if (next === 0) {
-        const copy = { ...prev };
-        delete copy[productId];
-        return copy;
-      }
-      return { ...prev, [productId]: next };
-    });
-  };
-
-  const clearCustomerCart = () => {
-    setCustomerCart({});
-  };
 
   // Toast
   const [toast, setToast] = useState<{ title: string; message: string } | null>(null);
@@ -487,9 +450,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         createOrder,
         cancelOrder,
         updateOrderStatus,
-        customerCart,
-        updateCustomerCart,
-        clearCustomerCart,
         toast,
         showToast,
         toPersianDigits,
