@@ -35,6 +35,15 @@ export const LiveTablesMonitoring: React.FC = () => {
   const pendingCount = orders.filter((o) => o.status === 'pending').length;
   const prepCount = orders.filter((o) => o.status === 'in_preparation').length;
 
+  const validOrders = orders.filter((o) => o.dbStatus !== 'cancelled');
+  const todayOrders = validOrders.filter((o) => {
+    if (!o.createdAt) return false;
+    return new Date(o.createdAt).toDateString() === new Date().toDateString();
+  }).length;
+  const monthOrdersCount = validOrders.length;
+  const monthSales = validOrders.reduce((sum, o) => sum + o.total, 0);
+  const inProgressCount = pendingCount + prepCount;
+
   return (
     <div className="flex flex-col w-full pb-12 select-none">
       {/* Top Banner & Live Shift Strip */}
@@ -122,7 +131,7 @@ export const LiveTablesMonitoring: React.FC = () => {
             </div>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-4xl font-bold text-[#002252]">{toPersianDigits(44)}</span>
+            <span className="text-4xl font-bold text-[#002252]">{toPersianDigits(todayOrders)}</span>
             <span className="text-base text-[#6E6B67] font-medium">سفارش</span>
           </div>
           <div className="mt-3 flex items-center justify-between pt-2 border-t border-[#FAF2EC] text-sm text-[#835428]">
@@ -141,7 +150,7 @@ export const LiveTablesMonitoring: React.FC = () => {
             </div>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-4xl font-bold text-[#002252]">{toPersianDigits('۱,۲۸۰')}</span>
+            <span className="text-4xl font-bold text-[#002252]">{toPersianDigits(monthOrdersCount)}</span>
             <span className="text-base text-[#6E6B67] font-medium">سفارش</span>
           </div>
           <div className="mt-3 flex items-center justify-between pt-2 border-t border-[#FAF2EC] text-sm text-[#835428]">
@@ -160,7 +169,7 @@ export const LiveTablesMonitoring: React.FC = () => {
             </div>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-3xl font-bold text-[#002252] tracking-tight">{toPersianDigits('۱۸۵,۴۰۰,۰۰۰')}</span>
+            <span className="text-3xl font-bold text-[#002252] tracking-tight">{formatPrice(monthSales)}</span>
             <span className="text-sm font-bold text-[#835428]">تومان</span>
           </div>
           <div className="mt-3 flex items-center justify-between pt-2 border-t border-[#FAF2EC] text-sm text-[#6E6B67]">
@@ -179,11 +188,11 @@ export const LiveTablesMonitoring: React.FC = () => {
             </div>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-4xl font-bold text-[#002252]">{toPersianDigits(6)}</span>
+            <span className="text-4xl font-bold text-[#002252]">{toPersianDigits(inProgressCount)}</span>
             <span className="text-base text-[#6E6B67] font-medium">سفارش فعال</span>
           </div>
           <div className="mt-3 flex items-center justify-between pt-2 border-t border-[#FAF2EC] text-sm text-[#835428] font-medium">
-            <span>۴ در حال آماده‌سازی • ۲ در انتظار اقدام</span>
+            <span>{toPersianDigits(prepCount)} در حال آماده‌سازی • {toPersianDigits(pendingCount)} در انتظار اقدام</span>
             <span className="w-2.5 h-2.5 rounded-full bg-[#BD8655] animate-pulse"></span>
           </div>
           <div className="absolute bottom-0 right-0 left-0 h-1 bg-[#BD8655]"></div>
@@ -237,7 +246,7 @@ export const LiveTablesMonitoring: React.FC = () => {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-xl font-bold text-[#002252]">
-                            فاکتور سفارش #فیش-{toPersianDigits(order.id)}
+                            فاکتور سفارش #فیش-{toPersianDigits(order.number ?? '-')}
                           </span>
                           {isNew ? (
                             <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 font-bold border border-red-300">
@@ -391,7 +400,7 @@ export const LiveTablesMonitoring: React.FC = () => {
                 >
                   {tables.map((t) => (
                     <option key={t.id} value={t.id}>
-                      میز {toPersianDigits(t.id)} ({t.section} - {toPersianDigits(t.capacity)} نفره)
+                      میز {toPersianDigits(t.id)} ({toPersianDigits(t.capacity)} نفره)
                     </option>
                   ))}
                 </select>

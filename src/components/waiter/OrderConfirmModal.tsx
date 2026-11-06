@@ -19,8 +19,9 @@ export const OrderConfirmModal: React.FC<OrderConfirmModalProps> = ({
 }) => {
   const { activeWaiter, createOrder, toPersianDigits, formatPrice, showToast } = useApp();
 
-  const [note, setNote] = useState('چای کم‌رنگ باشد، بدون قند مصنوعی (همراه با نبات سنتی زعفرانی آورده شود).');
+  const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
@@ -28,29 +29,47 @@ export const OrderConfirmModal: React.FC<OrderConfirmModalProps> = ({
   const serviceFee = Math.round(subtotal * 0.1);
   const grandTotal = subtotal + serviceFee;
 
-  const handleConfirmAndSend = () => {
+  const handleConfirmAndSend = async () => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
-    setTimeout(() => {
-      createOrder({
-        tableNumber,
-        waiterName: activeWaiter ? activeWaiter.name : 'علی رضایی',
-        waiterCode: activeWaiter ? activeWaiter.code : '۱۰۲۱',
-        status: 'pending',
-        time: new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }),
-        date: 'پنج‌شنبه ۲۴ آبان ۱۴۰۳',
-        items,
-        subtotal,
-        tax: 0,
-        serviceFee,
-        total: grandTotal,
-        guestNote: note,
-        paymentMethod: 'pos',
-        isPaid: false
-      });
-      setIsSubmitting(false);
-      onOrderConfirmed();
-      showToast('سفارش ارسال شد', `سفارش میز ${tableNumber} با موفقیت به پنل ادمین و مطبخ ارسال گردید.`);
-    }, 600);
+    setError('');
+
+    const created = await createOrder({
+      tableNumber,
+      waiterName: activeWaiter?.name ?? '',
+      waiterCode: activeWaiter?.code ?? '',
+      status: 'pending',
+      time: new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }),
+      date: new Date().toLocaleDateString('fa-IR'),
+      items,
+      subtotal,
+      tax: 0,
+      serviceFee,
+      total: grandTotal,
+      guestNote: note.trim() || undefined,
+      paymentMethod: 'pos',
+      isPaid: false,
+    });
+
+    setIsSubmitting(false);
+
+    if (!created) {
+      setError('ثبت سفارش انجام نشد. اتصال شبکه و موجودی اقلام را بررسی کنید.');
+      return;
+    }
+
+    showToast(
+      'سفارش ارسال شد',
+      `فیش #${created.number ?? ''} میز ${tableNumber} با موفقیت به پنل مدیریت ارسال گردید.`
+    );
+    setNote('');
+    onOrderConfirmed();
+  };
+
+  const handleClose = () => {
+    if (isSubmitting) return;
+    setError('');
+    onClose();
   };
 
   return (
@@ -68,13 +87,13 @@ export const OrderConfirmModal: React.FC<OrderConfirmModalProps> = ({
                 <h1 className="text-xl md:text-2xl font-bold text-[#002252] tracking-tight">
                   پیش‌فاکتور و تایید نهایی سفارش میز {toPersianDigits(tableNumber)}
                 </h1>
-                <span className="text-xs text-[#835428] font-bold">مهماندار: {activeWaiter?.name}</span>
+                <span className="text-xs text-[#835428] font-bold">مهماندار: {activeWaiter?.name || '-'}</span>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-200 transition-colors cursor-pointer"
             >
               <span className="material-symbols-outlined text-xl">close</span>
@@ -136,6 +155,13 @@ export const OrderConfirmModal: React.FC<OrderConfirmModalProps> = ({
             ></textarea>
           </section>
 
+          {error && (
+            <div className="mt-3 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-red-800 text-sm font-bold">
+              <span className="material-symbols-outlined text-lg shrink-0">error</span>
+              <span>{error}</span>
+            </div>
+          )}
+
           {/* Calculations Box */}
           <section className="pt-4">
             <div className="bg-[#FAF2EC] p-4 rounded-2xl border border-[#EADBCE] space-y-2.5">
@@ -174,7 +200,7 @@ export const OrderConfirmModal: React.FC<OrderConfirmModalProps> = ({
         <div className="p-4 bg-[#FAF2EC] border-t border-[#EADBCE] flex flex-col sm:flex-row items-center gap-3">
           <button
             type="button"
-            onClick={handleConfirmAndSend}
+            onClick={() => void handleConfirmAndSend()}
             disabled={isSubmitting}
             className="w-full sm:flex-1 py-3.5 bg-[#002252] hover:bg-[#00377B] text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition-all text-lg cursor-pointer disabled:opacity-50"
           >

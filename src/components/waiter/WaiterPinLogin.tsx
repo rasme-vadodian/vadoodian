@@ -1,49 +1,60 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { normalizeDigits } from '../../shared/api/mappers';
 
 export const WaiterPinLogin: React.FC = () => {
-  const { waiters, setActiveWaiter, setWaiterView, showToast, toPersianDigits } = useApp();
+  const { loginWaiter, navigate } = useApp();
 
-  const [selectedShift, setSelectedShift] = useState<'evening' | 'morning'>('evening');
-  const [selectedWaiterCode, setSelectedWaiterCode] = useState('۱۰۲۱');
+  const [staffCode, setStaffCode] = useState('');
   const [enteredPin, setEnteredPin] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  const activeWaiter = waiters.find((w) => w.code === selectedWaiterCode) || waiters[0];
+  const [error, setError] = useState('');
 
   const handleAppendDigit = (digit: string) => {
-    if (enteredPin.length < 4) {
-      const nextPin = enteredPin + digit;
-      setEnteredPin(nextPin);
-      if (nextPin.length === 4) {
-        // Auto trigger login or feedback
-      }
-    }
+    if (isLoggingIn) return;
+    setError('');
+    setEnteredPin((prev) => (prev.length < 4 ? prev + digit : prev));
   };
 
   const handleBackspace = () => {
-    if (enteredPin.length > 0) {
-      setEnteredPin(enteredPin.slice(0, -1));
-    }
+    if (isLoggingIn) return;
+    setError('');
+    setEnteredPin((prev) => prev.slice(0, -1));
   };
 
   const handleClearPin = () => {
+    if (isLoggingIn) return;
+    setError('');
     setEnteredPin('');
   };
 
-  const handleSubmit = () => {
-    if (enteredPin.length < 4) {
-      showToast('خطا', 'لطفاً پین‌کد ۴ رقمی خود را وارد فرمایید.');
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (isLoggingIn) return;
+
+    const code = normalizeDigits(staffCode).trim();
+    const pin = normalizeDigits(enteredPin).trim();
+
+    if (!code) {
+      setError('کد پرسنلی خود را وارد کنید.');
+      return;
+    }
+    if (pin.length < 4) {
+      setError('پین‌کد ۴ رقمی را کامل وارد کنید.');
       return;
     }
 
     setIsLoggingIn(true);
-    setTimeout(() => {
+    setError('');
+    try {
+      const result = await loginWaiter(code, pin);
+      if (!result.ok) {
+        setError(result.message ?? 'ورود ناموفق بود.');
+        setEnteredPin('');
+      }
+    } finally {
       setIsLoggingIn(false);
-      setActiveWaiter(activeWaiter);
-      showToast('ورود موفق', `خوش آمدید، مهماندار ${activeWaiter.name}! شیفت فعال گردید.`);
-      setWaiterView('waiter_workspace');
-    }, 500);
+    }
   };
 
   return (
@@ -67,173 +78,141 @@ export const WaiterPinLogin: React.FC = () => {
           <p className="text-lg text-[#835428] font-bold">کافه و موزه تاریخی ودودیان</p>
         </div>
 
-        {/* Shift Selection */}
-        <div className="bg-[#FAF2EC] rounded-2xl p-3.5 shadow-xs border border-[#EADBCE] mb-3.5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-base font-bold text-[#1E1B18] flex items-center gap-1">
-              <span className="material-symbols-outlined text-base text-[#BD8655]">schedule</span>
-              <span>شیفت کاری فعال:</span>
-            </span>
-            <span className="text-xs text-[#6E6B67] font-bold">امروز ۲۴ آبان</span>
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          {/* Staff Code */}
+          <div className="bg-[#FAF2EC] rounded-2xl p-3.5 shadow-xs border border-[#EADBCE] mb-3.5">
+            <label htmlFor="staff-code" className="text-base font-bold text-[#1E1B18] flex items-center gap-1 mb-2">
+              <span className="material-symbols-outlined text-base text-[#BD8655]">person</span>
+              <span>کد پرسنلی:</span>
+            </label>
+            <input
+              id="staff-code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="username"
+              value={staffCode}
+              onChange={(e) => {
+                setError('');
+                setStaffCode(e.target.value);
+              }}
+              disabled={isLoggingIn}
+              placeholder="مثلاً ۱۰۲۱"
+              className="w-full bg-white border-2 border-[#EADBCE] focus:border-[#002252] rounded-xl px-4 py-2.5 text-center text-2xl font-bold font-mono text-[#002252] outline-none transition-colors disabled:opacity-60"
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setSelectedShift('evening')}
-              className={`flex flex-col items-start p-2.5 rounded-xl text-right transition-all cursor-pointer ${
-                selectedShift === 'evening'
-                  ? 'bg-[#002252] text-white shadow-sm ring-1 ring-[#BD8655]/40'
-                  : 'bg-white text-[#1E1B18] border border-[#EADBCE]'
-              }`}
-            >
-              <div className="flex items-center justify-between w-full mb-0.5">
-                <span className="text-lg font-bold">شیفت عصر</span>
-                <span className="material-symbols-outlined text-base text-[#F8BA84]">wb_twilight</span>
+          {/* Handheld PIN Pad Interface */}
+          <div className="bg-[#FAF2EC] rounded-2xl p-3.5 shadow-xs border border-[#EADBCE] mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-base font-bold text-[#1E1B18] flex items-center gap-1">
+                <span className="material-symbols-outlined text-base text-[#BD8655]">lock</span>
+                <span>پین‌کد ورود ۴ رقمی:</span>
               </div>
-              <span className="text-xs opacity-80 font-mono">۱۶:۰۰ الی ۲۴:۰۰</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSelectedShift('morning')}
-              className={`flex flex-col items-start p-2.5 rounded-xl text-right transition-all cursor-pointer ${
-                selectedShift === 'morning'
-                  ? 'bg-[#002252] text-white shadow-sm ring-1 ring-[#BD8655]/40'
-                  : 'bg-white text-[#1E1B18] border border-[#EADBCE]'
-              }`}
-            >
-              <div className="flex items-center justify-between w-full mb-0.5">
-                <span className="text-lg font-bold">شیفت صبح</span>
-                <span className="material-symbols-outlined text-base text-[#BD8655]">wb_sunny</span>
-              </div>
-              <span className="text-xs opacity-80 font-mono">۰۸:۰۰ الی ۱۶:۰۰</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Waiter Quick Select Chips */}
-        <div className="bg-[#FAF2EC] rounded-2xl p-3.5 shadow-xs border border-[#EADBCE] mb-3.5">
-          <label className="text-base font-bold text-[#1E1B18] flex items-center gap-1 mb-2">
-            <span className="material-symbols-outlined text-base text-[#BD8655]">person</span>
-            <span>انتخاب سریع مهماندار:</span>
-          </label>
-
-          <div className="grid grid-cols-3 gap-2">
-            {waiters.slice(0, 3).map((w) => {
-              const isSelected = selectedWaiterCode === w.code;
-              return (
-                <button
-                  key={w.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedWaiterCode(w.code);
-                    setEnteredPin('');
-                  }}
-                  className={`py-2 px-1 rounded-xl text-center transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#BD8655] text-white shadow-sm ring-2 ring-[#002252]'
-                      : 'bg-white text-[#1E1B18] border border-[#EADBCE] hover:border-[#BD8655]'
-                  }`}
-                >
-                  <div className="text-base font-bold truncate leading-tight">{w.name}</div>
-                  <div className="text-xs mt-0.5 font-mono opacity-80">کد {w.code}</div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Handheld PIN Pad Interface */}
-        <div className="bg-[#FAF2EC] rounded-2xl p-3.5 shadow-xs border border-[#EADBCE] mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-base font-bold text-[#1E1B18] flex items-center gap-1">
-              <span className="material-symbols-outlined text-base text-[#BD8655]">lock</span>
-              <span>پین‌کد ورود ۴ رقمی:</span>
-            </div>
-            <button
-              type="button"
-              onClick={handleClearPin}
-              className="text-sm text-[#835428] font-bold hover:underline cursor-pointer"
-            >
-              پاک کردن
-            </button>
-          </div>
-
-          {/* 4 Visual Dots */}
-          <div className="flex items-center justify-center gap-4 py-2 mb-3 bg-white rounded-xl border border-[#EADBCE]">
-            {[0, 1, 2, 3].map((idx) => {
-              const isFilled = idx < enteredPin.length;
-              return (
-                <div
-                  key={idx}
-                  className={`w-3.5 h-3.5 rounded-full transition-all duration-150 ${
-                    isFilled ? 'bg-[#002252] scale-125 shadow-xs' : 'bg-gray-300'
-                  }`}
-                />
-              );
-            })}
-          </div>
-
-          {/* Keypad */}
-          <div className="grid grid-cols-3 gap-2">
-            {['۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'].map((digit) => (
               <button
-                key={digit}
                 type="button"
-                onClick={() => handleAppendDigit(digit)}
-                className="h-12 rounded-xl bg-white text-2xl font-bold text-[#002252] shadow-xs active:bg-[#FFDCC1] border border-[#EADBCE] transition-all flex items-center justify-center cursor-pointer"
+                onClick={handleClearPin}
+                className="text-sm text-[#835428] font-bold hover:underline cursor-pointer"
               >
-                {digit}
+                پاک کردن
               </button>
-            ))}
+            </div>
 
-            <button
-              type="button"
-              onClick={handleClearPin}
-              className="h-12 rounded-xl bg-[#FAF2EC] text-base font-bold text-[#6E6B67] border border-[#EADBCE] active:bg-[#EADBCE] transition-all flex items-center justify-center cursor-pointer"
-            >
-              لغو
-            </button>
+            {/* 4 Visual Dots */}
+            <div className="flex items-center justify-center gap-4 py-2 mb-3 bg-white rounded-xl border border-[#EADBCE]">
+              {[0, 1, 2, 3].map((idx) => {
+                const isFilled = idx < enteredPin.length;
+                return (
+                  <div
+                    key={idx}
+                    className={`w-3.5 h-3.5 rounded-full transition-all duration-150 ${
+                      isFilled ? 'bg-[#002252] scale-125 shadow-xs' : 'bg-gray-300'
+                    }`}
+                  />
+                );
+              })}
+            </div>
 
-            <button
-              type="button"
-              onClick={() => handleAppendDigit('۰')}
-              className="h-12 rounded-xl bg-white text-2xl font-bold text-[#002252] shadow-xs active:bg-[#FFDCC1] border border-[#EADBCE] transition-all flex items-center justify-center cursor-pointer"
-            >
-              ۰
-            </button>
+            {/* Keypad */}
+            <div className="grid grid-cols-3 gap-2">
+              {['۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'].map((digit) => (
+                <button
+                  key={digit}
+                  type="button"
+                  onClick={() => handleAppendDigit(digit)}
+                  disabled={isLoggingIn}
+                  className="h-12 rounded-xl bg-white text-2xl font-bold text-[#002252] shadow-xs active:bg-[#FFDCC1] border border-[#EADBCE] transition-all flex items-center justify-center cursor-pointer disabled:opacity-50"
+                >
+                  {digit}
+                </button>
+              ))}
 
-            <button
-              type="button"
-              onClick={handleBackspace}
-              className="h-12 rounded-xl bg-[#FAF2EC] text-[#002252] border border-[#EADBCE] active:bg-[#EADBCE] transition-all flex items-center justify-center cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-2xl">backspace</span>
-            </button>
+              <button
+                type="button"
+                onClick={handleClearPin}
+                disabled={isLoggingIn}
+                className="h-12 rounded-xl bg-[#FAF2EC] text-base font-bold text-[#6E6B67] border border-[#EADBCE] active:bg-[#EADBCE] transition-all flex items-center justify-center cursor-pointer disabled:opacity-50"
+              >
+                لغو
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleAppendDigit('۰')}
+                disabled={isLoggingIn}
+                className="h-12 rounded-xl bg-white text-2xl font-bold text-[#002252] shadow-xs active:bg-[#FFDCC1] border border-[#EADBCE] transition-all flex items-center justify-center cursor-pointer disabled:opacity-50"
+              >
+                ۰
+              </button>
+
+              <button
+                type="button"
+                onClick={handleBackspace}
+                disabled={isLoggingIn}
+                className="h-12 rounded-xl bg-[#FAF2EC] text-[#002252] border border-[#EADBCE] active:bg-[#EADBCE] transition-all flex items-center justify-center cursor-pointer disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-2xl">backspace</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Login Button */}
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isLoggingIn}
-          className="w-full bg-[#002252] hover:bg-[#00377B] text-white py-3.5 px-4 rounded-2xl shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-3 cursor-pointer disabled:opacity-60"
-        >
-          <span className="material-symbols-outlined text-2xl">login</span>
-          <span className="text-xl font-bold tracking-wide">
-            {isLoggingIn ? 'در حال ورود به سالن...' : 'ورود به شیفت و سالن'}
-          </span>
-        </button>
+          {error && (
+            <div className="mb-3 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-red-800 text-sm font-bold">
+              <span className="material-symbols-outlined text-lg shrink-0">error</span>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Login Button */}
+          <button
+            type="submit"
+            disabled={isLoggingIn}
+            className="w-full bg-[#002252] hover:bg-[#00377B] text-white py-3.5 px-4 rounded-2xl shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-3 cursor-pointer disabled:opacity-60"
+          >
+            <span className="material-symbols-outlined text-2xl">login</span>
+            <span className="text-xl font-bold tracking-wide">
+              {isLoggingIn ? 'در حال ورود به سالن...' : 'ورود به شیفت و سالن'}
+            </span>
+          </button>
+        </form>
       </div>
 
       {/* Footer Info */}
-      <div className="bg-[#FAF2EC] rounded-xl p-2.5 flex items-start gap-2 text-[#6E6B67] border border-[#EADBCE] text-xs">
-        <span className="material-symbols-outlined text-[#BD8655] text-lg shrink-0 mt-0.5">info</span>
-        <p className="leading-snug">
-          رمز عبور نمونه: برای ویتر انتخابی پین ۴ رقمی (مثلاً 4123) ثبت شده است.
-        </p>
+      <div className="flex flex-col gap-2">
+        <div className="bg-[#FAF2EC] rounded-xl p-2.5 flex items-start gap-2 text-[#6E6B67] border border-[#EADBCE] text-xs">
+          <span className="material-symbols-outlined text-[#BD8655] text-lg shrink-0 mt-0.5">info</span>
+          <p className="leading-snug">
+            کد پرسنلی و پین خود را از مدیر عمارت دریافت کنید. پس از چند تلاش ناموفق،
+            ورود موقتاً محدود می‌شود.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="text-sm text-[#835428] font-bold hover:underline cursor-pointer"
+        >
+          بازگشت به صفحه اصلی
+        </button>
       </div>
     </div>
   );

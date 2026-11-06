@@ -15,8 +15,8 @@ declare
   ok        boolean := false;
 begin
   -- ---------- آماده‌سازی ----------
-  insert into public.tables (number, capacity, section)
-  values (9999, 2, 'تست')
+  insert into public.tables (number, capacity)
+  values (9999, 2)
   returning id into t_id;
 
   insert into public.table_sessions (table_id) values (t_id) returning id into s_id;

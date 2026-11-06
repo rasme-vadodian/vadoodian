@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { GlobalModeBar } from './components/common/GlobalModeBar';
+import { LandingPage } from './components/common/LandingPage';
 
 // Admin Views
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -23,48 +24,124 @@ import { CustomerMenu } from './components/customer/CustomerMenu';
 import { CustomerQuickGrid } from './components/customer/CustomerQuickGrid';
 import { CustomerItemDetail } from './components/customer/CustomerItemDetail';
 
+/** نوار تغییر نقش فقط در محیط توسعه و با ?demo=1 فعال می‌شود. */
+const demoBarEnabled = (): boolean => {
+  if (!import.meta.env.DEV) return false;
+  return new URLSearchParams(window.location.search).get('demo') === '1';
+};
+
+const ScreenLoading: React.FC<{ label: string }> = ({ label }) => (
+  <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-[#FFF8F4] text-[#002252]">
+    <span className="material-symbols-outlined text-4xl animate-spin">progress_activity</span>
+    <p className="font-bold text-lg">{label}</p>
+  </div>
+);
+
+const CustomerGate: React.FC = () => {
+  const {
+    customerView,
+    customerLoading,
+    customerError,
+    customerSession,
+    retryCustomerSession,
+    navigate,
+  } = useApp();
+
+  if (customerError) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center gap-4 bg-[#FFF8F4] px-6 text-center">
+        <span className="material-symbols-outlined text-5xl text-[#BD8655]">qr_code_2</span>
+        <h1 className="text-2xl font-bold text-[#002252]">دسترسی به میز ممکن نشد</h1>
+        <p className="text-sm text-[#6E6B67] max-w-sm leading-relaxed">{customerError}</p>
+        <div className="flex items-center gap-2 mt-2">
+          <button
+            type="button"
+            onClick={retryCustomerSession}
+            className="px-5 py-2.5 rounded-xl bg-[#002252] text-white font-bold cursor-pointer hover:bg-[#00377B]"
+          >
+            تلاش دوباره
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="px-5 py-2.5 rounded-xl bg-white border border-[#EADBCE] text-[#002252] font-bold cursor-pointer"
+          >
+            صفحه اصلی
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (customerLoading || !customerSession) {
+    return <ScreenLoading label="در حال باز کردن میز..." />;
+  }
+
+  return (
+    <>
+      {customerView === 'customer_menu' && <CustomerMenu />}
+      {customerView === 'customer_quick_grid' && <CustomerQuickGrid />}
+      {customerView === 'customer_item_detail' && <CustomerItemDetail />}
+    </>
+  );
+};
+
 const MainAppContent: React.FC = () => {
-  const { mode, adminView, waiterView, customerView, toast } = useApp();
+  const {
+    mode,
+    adminView,
+    adminAuthLoading,
+    adminSession,
+    waiterView,
+    waiterAuthLoading,
+    waiterSession,
+    toast,
+  } = useApp();
+
+  const content = (() => {
+    if (mode === 'home') {
+      return <LandingPage />;
+    }
+
+    if (mode === 'admin') {
+      if (adminAuthLoading) return <ScreenLoading label="بررسی نشست مدیریت..." />;
+      if (!adminSession || adminView === 'admin_login') return <AdminLogin />;
+      return (
+        <AdminLayout>
+          {adminView === 'live_tables' && <LiveTablesMonitoring />}
+          {adminView === 'orders_list' && <OrdersList />}
+          {adminView === 'order_detail' && <OrderDetailView />}
+          {adminView === 'menu_management' && <MenuManagement />}
+          {adminView === 'product_edit' && <ProductEditForm />}
+          {adminView === 'staff_performance' && <StaffPerformance />}
+        </AdminLayout>
+      );
+    }
+
+    if (mode === 'waiter') {
+      if (waiterAuthLoading) return <ScreenLoading label="بررسی نشست مهماندار..." />;
+      if (!waiterSession || waiterView === 'waiter_login') return <WaiterPinLogin />;
+      return (
+        <>
+          {waiterView === 'waiter_workspace' && <WaiterWorkspace />}
+          {waiterView === 'waiter_ordering' && <WaiterOrderTaking />}
+          <WaiterProfileModal />
+        </>
+      );
+    }
+
+    if (mode === 'customer') {
+      return <CustomerGate />;
+    }
+
+    return <LandingPage />;
+  })();
 
   return (
     <div className="min-h-screen bg-[#FFF8F4] flex flex-col font-sans">
-      {/* Universal Mode Switcher & Quick Navigation */}
-      <GlobalModeBar />
+      {demoBarEnabled() && <GlobalModeBar />}
 
-      {/* Dynamic Screen Renderer */}
-      <div className="flex-1 flex flex-col">
-        {mode === 'admin' && (
-          adminView === 'admin_login' ? (
-            <AdminLogin />
-          ) : (
-            <AdminLayout>
-              {adminView === 'live_tables' && <LiveTablesMonitoring />}
-              {adminView === 'orders_list' && <OrdersList />}
-              {adminView === 'order_detail' && <OrderDetailView />}
-              {adminView === 'menu_management' && <MenuManagement />}
-              {adminView === 'product_edit' && <ProductEditForm />}
-              {adminView === 'staff_performance' && <StaffPerformance />}
-            </AdminLayout>
-          )
-        )}
-
-        {mode === 'waiter' && (
-          <>
-            {waiterView === 'waiter_login' && <WaiterPinLogin />}
-            {waiterView === 'waiter_workspace' && <WaiterWorkspace />}
-            {waiterView === 'waiter_ordering' && <WaiterOrderTaking />}
-            <WaiterProfileModal />
-          </>
-        )}
-
-        {mode === 'customer' && (
-          <>
-            {customerView === 'customer_menu' && <CustomerMenu />}
-            {customerView === 'customer_quick_grid' && <CustomerQuickGrid />}
-            {customerView === 'customer_item_detail' && <CustomerItemDetail />}
-          </>
-        )}
-      </div>
+      <div className="flex-1 flex flex-col">{content}</div>
 
       {/* Global Interactive Toast Notification */}
       {toast && (

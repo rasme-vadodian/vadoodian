@@ -99,10 +99,10 @@ async function main() {
   for (const t of INITIAL_TABLES) {
     // on conflict do nothing تا وضعیت زنده‌ی میزها در اجرای دوباره بازنویسی نشود
     const { rowCount } = await client.query(
-      `insert into public.tables (number, capacity, section, status)
-       values ($1, $2, $3, $4)
+      `insert into public.tables (number, capacity, status)
+       values ($1, $2, $3)
        on conflict (number) do nothing`,
-      [t.id, t.capacity, t.section, TABLE_STATUS[t.status] ?? 'free']
+      [t.id, t.capacity, TABLE_STATUS[t.status] ?? 'free']
     );
     tableCount += rowCount ?? 0;
   }

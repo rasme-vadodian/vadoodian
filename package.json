@@ -10,7 +10,10 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "db": "node scripts/db.mjs",
-    "seed": "tsx scripts/seed.ts"
+    "backup": "node scripts/backup.mjs",
+    "seed": "tsx scripts/seed.ts",
+    "admin:create": "node scripts/admin.mjs create",
+    "admin:promote": "node scripts/admin.mjs promote"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

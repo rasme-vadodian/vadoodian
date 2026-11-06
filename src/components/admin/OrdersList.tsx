@@ -10,6 +10,7 @@ export const OrdersList: React.FC = () => {
     setQuickInvoiceOrder,
     quickInvoiceOrder,
     showToast,
+    refreshData,
     toPersianDigits,
     formatPrice
   } = useApp();
@@ -28,6 +29,7 @@ export const OrdersList: React.FC = () => {
     const query = searchTerm.trim().toLowerCase();
     const matchesSearch =
       !query ||
+      (order.number != null && String(order.number).includes(query)) ||
       order.id.toLowerCase().includes(query) ||
       order.tableNumber.toString().includes(query) ||
       order.waiterName.toLowerCase().includes(query) ||
@@ -41,14 +43,15 @@ export const OrdersList: React.FC = () => {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => {
+    refreshData();
+    window.setTimeout(() => {
       setIsRefreshing(false);
-      showToast('بروزرسانی داده‌ها', 'فهرست سفارشات و فیش‌های روز با موفقیت همگام‌سازی شد.');
+      showToast('بروزرسانی داده‌ها', 'فهرست سفارشات و فیش‌ها از دیتابیس بازخوانی شد.');
     }, 600);
   };
 
-  const handleQuickPrint = (receiptId: string) => {
-    showToast('چاپ فیش حرارتی', `دستور چاپ فیش آشپزخانه برای سفارش #${receiptId} صادر شد.`);
+  const handleQuickPrint = (receiptNumber: number | string) => {
+    showToast('چاپ فیش حرارتی', `دستور چاپ فیش آشپزخانه برای سفارش #${receiptNumber} صادر شد.`);
   };
 
   const totalDisplayedPrice = filteredOrders.reduce((sum, o) => sum + o.total, 0);
@@ -143,7 +146,7 @@ export const OrdersList: React.FC = () => {
             <thead>
               <tr className="bg-[#FAF2EC] text-[#002252] border-b border-[#EADBCE] text-lg font-bold">
                 <th className="py-3 px-4">شماره فیش</th>
-                <th className="py-3 px-4">موقعیت میز</th>
+                <th className="py-3 px-4">میز</th>
                 <th className="py-3 px-4">مهماندار / ویتر</th>
                 <th className="py-3 px-4">خلاصه اقلام فاکتور</th>
                 <th className="py-3 px-4 text-left">مبلغ کل (تومان)</th>
@@ -165,11 +168,13 @@ export const OrdersList: React.FC = () => {
                     .join('، ');
 
                   const isPending = order.status === 'pending' || order.status === 'in_preparation';
+                  const isCancelled = order.dbStatus === 'cancelled';
+                  const isPaid = order.dbStatus === 'paid';
 
                   return (
                     <tr key={order.id} className="hover:bg-[#FAF2EC]/50 transition-colors">
                       <td className="py-3 px-4 font-bold text-[#002252] text-lg">
-                        #{toPersianDigits(order.id)}
+                        #{toPersianDigits(order.number ?? '-')}
                       </td>
                       <td className="py-3 px-4 font-bold text-[#1E1B18]">
                         میز {toPersianDigits(order.tableNumber)}
@@ -189,7 +194,15 @@ export const OrdersList: React.FC = () => {
                         {formatPrice(order.total)}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {isPending ? (
+                        {isCancelled ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                            لغو شده
+                          </span>
+                        ) : isPaid ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-200">
+                            تسویه شده
+                          </span>
+                        ) : isPending ? (
                           <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
                             سفارش داده شده
                           </span>
@@ -211,7 +224,7 @@ export const OrdersList: React.FC = () => {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleQuickPrint(order.id)}
+                            onClick={() => handleQuickPrint(order.number ?? order.id)}
                             className="p-1.5 rounded-lg text-[#BD8655] hover:bg-[#BD8655]/10 transition-colors cursor-pointer"
                             title="چاپ فیش آشپزخانه"
                           >
@@ -269,7 +282,7 @@ export const OrdersList: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-2xl text-[#F8BA84]">receipt</span>
                 <span className="text-xl font-bold">
-                  جزئیات فاکتور شماره #{toPersianDigits(quickInvoiceOrder.id)}
+                  جزئیات فاکتور شماره #{toPersianDigits(quickInvoiceOrder.number ?? '-')}
                 </span>
               </div>
               <button
@@ -284,7 +297,7 @@ export const OrdersList: React.FC = () => {
             {/* Modal Content */}
             <div className="p-5 flex flex-col gap-3 text-base text-[#1E1B18]">
               <div className="flex justify-between items-center py-1.5 bg-[#FAF2EC] px-3 rounded-xl border border-[#EADBCE]/50">
-                <span className="text-[#6E6B67]">موقعیت سالن:</span>
+                <span className="text-[#6E6B67]">میز:</span>
                 <span className="font-bold text-[#002252] text-lg">میز شماره {toPersianDigits(quickInvoiceOrder.tableNumber)}</span>
               </div>
 

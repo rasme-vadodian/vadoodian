@@ -31,11 +31,11 @@ export const OrderDetailView: React.FC = () => {
   }
 
   const handlePrintThermal = () => {
-    showToast('چاپ فیش حرارتی', `فیش حرارتی سفارش #${order.id} به چاپگر مطبخ ارسال گردید.`);
+    showToast('چاپ فیش حرارتی', `فیش حرارتی سفارش #${order.number ?? '-'} به چاپگر مطبخ ارسال گردید.`);
   };
 
   const handleCancel = () => {
-    if (confirm(`آیا از لغو سفارش #${order.id} میز ${order.tableNumber} اطمینان دارید؟`)) {
+    if (confirm(`آیا از لغو سفارش #${order.number ?? '-'} میز ${order.tableNumber} اطمینان دارید؟`)) {
       cancelOrder(order.id);
       setAdminView('orders_list');
     }
@@ -59,7 +59,7 @@ export const OrderDetailView: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <span className="text-sm text-[#6E6B67] font-bold">شناسه سند:</span>
-            <span className="text-2xl font-bold text-[#002252]">فاکتور سفارش #فیش-{toPersianDigits(order.id)}</span>
+            <span className="text-2xl font-bold text-[#002252]">فاکتور سفارش #فیش-{toPersianDigits(order.number ?? '-')}</span>
           </div>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFDCC1] text-[#835428] font-bold text-sm">
@@ -275,8 +275,8 @@ export const OrderDetailView: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between text-[#6E6B67]">
-                <span>حق سرویس پذیرایی میز (۰٪):</span>
-                <span className="font-bold text-emerald-800">رایگان</span>
+                <span>حق سرویس و پذیرایی (۱۰٪):</span>
+                <span className="font-bold text-[#1E1B18]">{formatPrice(order.serviceFee)} تومان</span>
               </div>
             </div>
 
@@ -296,8 +296,9 @@ export const OrderDetailView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => updateOrderStatus(order.id, 'in_preparation')}
-                  className={`py-2 px-3 rounded-xl text-sm font-bold border transition-colors cursor-pointer ${
-                    order.status === 'in_preparation'
+                  disabled={order.dbStatus !== 'sent_to_admin'}
+                  className={`py-2 px-3 rounded-xl text-sm font-bold border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    order.dbStatus === 'in_preparation' || order.dbStatus === 'ready' || order.dbStatus === 'delivered'
                       ? 'bg-[#BD8655] text-white border-[#BD8655]'
                       : 'bg-[#FAF2EC] text-[#002252] border-[#EADBCE] hover:bg-[#EADBCE]'
                   }`}
@@ -306,14 +307,39 @@ export const OrderDetailView: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  onClick={() => updateOrderStatus(order.id, 'ready')}
+                  disabled={order.dbStatus !== 'in_preparation'}
+                  className={`py-2 px-3 rounded-xl text-sm font-bold border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    order.dbStatus === 'ready' || order.dbStatus === 'delivered'
+                      ? 'bg-blue-700 text-white border-blue-700'
+                      : 'bg-[#FAF2EC] text-[#002252] border-[#EADBCE] hover:bg-[#EADBCE]'
+                  }`}
+                >
+                  آماده سرو
+                </button>
+                <button
+                  type="button"
                   onClick={() => updateOrderStatus(order.id, 'delivered')}
-                  className={`py-2 px-3 rounded-xl text-sm font-bold border transition-colors cursor-pointer ${
-                    order.status === 'delivered'
+                  disabled={order.dbStatus !== 'ready'}
+                  className={`py-2 px-3 rounded-xl text-sm font-bold border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    order.dbStatus === 'delivered' || order.dbStatus === 'paid'
                       ? 'bg-emerald-700 text-white border-emerald-700'
                       : 'bg-[#FAF2EC] text-[#002252] border-[#EADBCE] hover:bg-[#EADBCE]'
                   }`}
                 >
                   تحویل داده شد
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateOrderStatus(order.id, 'paid')}
+                  disabled={order.dbStatus !== 'delivered'}
+                  className={`py-2 px-3 rounded-xl text-sm font-bold border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    order.dbStatus === 'paid'
+                      ? 'bg-gray-700 text-white border-gray-700'
+                      : 'bg-[#FAF2EC] text-[#002252] border-[#EADBCE] hover:bg-[#EADBCE]'
+                  }`}
+                >
+                  تسویه شد
                 </button>
               </div>
             </div>

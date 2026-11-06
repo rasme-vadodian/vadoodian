@@ -33,7 +33,6 @@ create table tables (
   id          uuid primary key default gen_random_uuid(),
   number      integer not null unique,
   capacity    integer not null default 4 check (capacity > 0),
-  section     text    not null default 'سالن اصلی',
   qr_token    text    not null unique default encode(gen_random_bytes(9), 'hex'),
   status      table_status not null default 'free',
   is_active   boolean not null default true,

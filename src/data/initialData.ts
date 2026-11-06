@@ -242,16 +242,16 @@ export const INITIAL_WAITERS: Waiter[] = [
 ];
 
 export const INITIAL_TABLES: TableItem[] = [
-  { id: 1, capacity: 2, status: 'occupied', section: 'شاه‌نشین حیاط', activeReceiptId: '۸۸۴۰' },
-  { id: 2, capacity: 4, status: 'calling_waiter', section: 'تالار آینه', activeReceiptId: '۸۸۳۹' },
-  { id: 3, capacity: 4, status: 'occupied', section: 'تالار آینه', activeReceiptId: '۸۸۳۶' },
-  { id: 4, capacity: 6, status: 'calling_waiter', section: 'شاه‌نشین حیاط', activeReceiptId: '۸۸۴۲' },
-  { id: 5, capacity: 2, status: 'in_preparation', section: 'ایوان حوض‌خانه' },
-  { id: 6, capacity: 8, status: 'calling_waiter', section: 'حیاط اندرونی', activeReceiptId: '۸۸۳۸' },
-  { id: 7, capacity: 4, status: 'occupied', section: 'شاه‌نشین حیاط', activeReceiptId: '۸۸۳۵' },
-  { id: 8, capacity: 4, status: 'occupied', section: 'حیاط اندرونی', activeReceiptId: '۸۸۳۹' },
-  { id: 12, capacity: 6, status: 'in_preparation', section: 'تالار آینه', activeReceiptId: '۸۸۴۱' },
-  { id: 15, capacity: 4, status: 'available', section: 'ایوان حوض‌خانه' }
+  { id: 1, capacity: 2, status: 'occupied', activeReceiptId: '۸۸۴۰' },
+  { id: 2, capacity: 4, status: 'calling_waiter', activeReceiptId: '۸۸۳۹' },
+  { id: 3, capacity: 4, status: 'occupied', activeReceiptId: '۸۸۳۶' },
+  { id: 4, capacity: 6, status: 'calling_waiter', activeReceiptId: '۸۸۴۲' },
+  { id: 5, capacity: 2, status: 'in_preparation' },
+  { id: 6, capacity: 8, status: 'calling_waiter', activeReceiptId: '۸۸۳۸' },
+  { id: 7, capacity: 4, status: 'occupied', activeReceiptId: '۸۸۳۵' },
+  { id: 8, capacity: 4, status: 'occupied', activeReceiptId: '۸۸۳۹' },
+  { id: 12, capacity: 6, status: 'in_preparation', activeReceiptId: '۸۸۴۱' },
+  { id: 15, capacity: 4, status: 'available' }
 ];
 
 export const INITIAL_ORDERS: Order[] = [

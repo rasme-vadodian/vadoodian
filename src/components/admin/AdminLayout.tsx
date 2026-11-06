@@ -6,9 +6,11 @@ interface AdminLayoutProps {
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const { adminView, setAdminView, calls, toPersianDigits } = useApp();
+  const { adminView, setAdminView, calls, toPersianDigits, adminSession, logoutAdmin } = useApp();
 
   const pendingCallsCount = calls.filter((c) => c.status === 'pending').length;
+  const adminName = adminSession?.fullName || 'مدیر کافه';
+  const adminInitial = adminName.trim().charAt(0) || 'م';
 
   const navItems: { view: AdminView; label: string; icon: string }[] = [
     { view: 'live_tables', label: 'میزهای زنده و سفارش‌ها', icon: 'table_restaurant' },
@@ -75,17 +77,19 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-[#EADBCE] shadow-xs">
             <div className="flex items-center gap-2.5 overflow-hidden">
               <div className="w-8 h-8 rounded-full bg-[#00377B] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                م
+                {adminInitial}
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-lg font-bold text-[#002252] leading-tight truncate">مدیر کافه</span>
+                <span className="text-lg font-bold text-[#002252] leading-tight truncate">{adminName}</span>
                 <span className="text-xs text-[#6E6B67]">سطح دسترسی کل</span>
               </div>
             </div>
             <button
-              onClick={() => setAdminView('admin_login')}
+              onClick={() => {
+                void logoutAdmin();
+              }}
               className="p-1.5 text-[#6E6B67] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-              title="صفحه ورود / خروج"
+              title="خروج از حساب"
               type="button"
             >
               <span className="material-symbols-outlined text-xl">logout</span>
@@ -135,7 +139,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <div className="h-6 w-px bg-[#EADBCE]"></div>
 
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#002252]">امیرحسین ودودیان</span>
+              <span className="text-lg font-bold text-[#002252]">{adminName}</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-[#BD8655]/15 text-[#835428] font-bold hidden sm:inline">
                 سرپرست مجموعه
               </span>

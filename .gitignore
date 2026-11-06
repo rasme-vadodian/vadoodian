@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+# فقط کلیدهای عمومی لازم برای بیلد (anon key امن است)
+!.env.production
+backups/

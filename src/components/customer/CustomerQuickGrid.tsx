@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { CategoryId, MenuItem } from '../../types';
+import { MenuItem } from '../../types';
 
 export const CustomerQuickGrid: React.FC = () => {
   const {
     products,
     categories,
+    customerSession,
+    customerCall,
     setSelectedProductId,
     setCustomerView,
     callWaiter,
@@ -16,7 +18,7 @@ export const CustomerQuickGrid: React.FC = () => {
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<'all' | CategoryId>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [quickDetailItem, setQuickDetailItem] = useState<MenuItem | null>(null);
 
   // Filtering products
@@ -34,8 +36,11 @@ export const CustomerQuickGrid: React.FC = () => {
   });
 
   const handleCallWaiter = () => {
-    callWaiter(4, 'میز ۴ (شاه‌نشین حیاط)');
-    setCallWaiterModalOpen(true);
+    if (customerCall) {
+      setCallWaiterModalOpen(true);
+      return;
+    }
+    callWaiter(customerSession?.tableNumber ?? 0, customerSession?.tableName);
   };
 
   const openFullDetail = (product: MenuItem) => {
@@ -58,7 +63,9 @@ export const CustomerQuickGrid: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold text-[#002252] leading-none">کافه و موزه ودودیان</span>
-              <span className="text-xs text-[#835428] font-bold mt-0.5">میز ۴ • شاه‌نشین حیاط</span>
+              <span className="text-xs text-[#835428] font-bold mt-0.5">
+                {customerSession ? customerSession.tableName : 'میز مهمان'} • منوی سریع
+              </span>
             </div>
           </div>
 
@@ -124,7 +131,7 @@ export const CustomerQuickGrid: React.FC = () => {
             </span>
           </button>
 
-          {categories.map((cat) => {
+          {categories.filter((cat) => cat.isActive).map((cat) => {
             const isSelected = selectedCategory === cat.id;
             const count = products.filter((p) => p.category === cat.id).length;
 
@@ -132,7 +139,7 @@ export const CustomerQuickGrid: React.FC = () => {
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => setSelectedCategory(cat.id as CategoryId)}
+                onClick={() => setSelectedCategory(cat.id)}
                 className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 cursor-pointer shrink-0 ${
                   isSelected
                     ? 'bg-[#002252] text-white shadow-xs'
@@ -254,7 +261,7 @@ export const CustomerQuickGrid: React.FC = () => {
           <span className="material-symbols-outlined text-xl text-[#FFDCC1] animate-bounce">
             notifications_active
           </span>
-          <span>فراخوانی مهماندار</span>
+          <span>{customerCall ? 'درخواست شما در حال بررسی است' : 'فراخوانی مهماندار'}</span>
         </button>
       </div>
 
@@ -340,7 +347,9 @@ export const CustomerQuickGrid: React.FC = () => {
             </div>
             <h3 className="text-2xl font-bold text-[#002252]">مهماندار فراخوانده شد</h3>
             <p className="text-base text-[#6E6B67] leading-relaxed">
-              پیام شما ثبت شد. مهماندار عمارت ودودیان تا لحظاتی دیگر جهت ثبت سفارش بر سر میز شما حاضر خواهد شد.
+              {customerCall
+                ? 'درخواست شما ثبت شده و در صف مهمانداران قرار دارد. به‌محض پذیرش، مهماندار بر سر میز حاضر می‌شود.'
+                : 'پیام شما ثبت شد. مهماندار عمارت ودودیان تا لحظاتی دیگر جهت ثبت سفارش بر سر میز شما حاضر خواهد شد.'}
             </p>
             <button
               type="button"

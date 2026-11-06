@@ -14,6 +14,7 @@ export const StaffPerformance: React.FC = () => {
   } = useApp();
 
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+  const [editingId, setEditingId] = useState<string | undefined>(undefined);
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [pin, setPin] = useState('');
@@ -25,12 +26,19 @@ export const StaffPerformance: React.FC = () => {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !code.trim() || pin.length < 4) {
-      showToast('خطا', 'لطفاً نام، کد کاربری و پین ۴ رقمی را به صورت کامل وارد فرمایید.');
+    const needsPin = formMode === 'create';
+    if (!name.trim() || !code.trim() || (needsPin && pin.length < 4)) {
+      showToast(
+        'خطا',
+        needsPin
+          ? 'لطفاً نام، کد کاربری و پین ۴ رقمی را کامل وارد فرمایید.'
+          : 'نام و کد کاربری را وارد فرمایید. برای تغییر پین، فیلد پین را پر کنید.'
+      );
       return;
     }
 
     saveWaiter({
+      id: editingId,
       name: name.trim(),
       code: code.trim(),
       pin: pin.trim(),
@@ -41,14 +49,16 @@ export const StaffPerformance: React.FC = () => {
     setName('');
     setCode('');
     setPin('');
+    setEditingId(undefined);
     setFormMode('create');
   };
 
   const startEditWaiter = (waiter: Waiter) => {
     setName(waiter.name);
     setCode(waiter.code);
-    setPin(waiter.pin);
+    setPin('');
     setShift(waiter.shift);
+    setEditingId(waiter.id);
     setFormMode('edit');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -101,6 +111,7 @@ export const StaffPerformance: React.FC = () => {
               type="button"
               onClick={() => {
                 setFormMode('create');
+                setEditingId(undefined);
                 setName('');
                 setCode('');
                 setPin('');
@@ -158,8 +169,8 @@ export const StaffPerformance: React.FC = () => {
                 maxLength={4}
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                placeholder="••••"
-                required
+                placeholder={formMode === 'edit' ? 'برای عدم تغییر خالی بگذارید' : '••••'}
+                required={formMode === 'create'}
                 className="w-full px-3.5 py-2 text-center tracking-widest rounded-xl bg-[#FAF2EC]/50 border border-[#EADBCE] text-2xl font-bold text-[#002252] outline-none focus:bg-white focus:border-[#002252] transition-all font-mono"
               />
             </div>

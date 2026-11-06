@@ -1,169 +1,178 @@
-# معماری پروژه ودودیان
+# معماری جامع نرم‌افزار ودودیان (Architecture & Client Design)
 
-> سند مرجع تصمیم‌های فنی. هر تغییری در ساختار باید اول اینجا به‌روز شود.
+> این سند مرجع رسمی تصمیم‌گیری‌های فنی، مهندسی نرم‌افزار، لایه‌بندی فرانت‌اند و نحوه ارتباط با پایگاه داده است. این فایل به صورت ویژه برای مدل‌های هوش مصنوعی (AI-Friendly) و نگهداشت آسان توسعه‌دهندگان طراحی شده است.
 
-## تصمیم‌های پایه
+---
 
-| موضوع | تصمیم |
-|---|---|
-| بک‌اند | Supabase (Postgres + Realtime + Auth) |
-| محدوده | تک‌شعبه — بدون `tenant_id` |
-| داده اولیه | از `src/data/initialData.ts` به‌عنوان seed منتقل می‌شود |
-| نقش‌ها | مشتری (بدون لاگین) · ویتر (PIN) · ادمین (پسورد) |
-| سبد خرید مشتری | **ندارد** — مشتری فقط منو و جزئیات محصول را می‌بیند و ویتر را فراخوان می‌کند |
-| زبان/RTL | حفظ کامل فارسی و `dir="rtl"` |
+## ۱. اصول بنیادین و پارادایم سیستم
 
-## نقش‌ها و مسیرها
+سیستم مدیریت سفارشات و سالن ودودیان بر پایه ۴ اصل مهندسی استوار است:
 
-```
-/t/:qrToken        مشتری — فقط با توکن QR میز، بدون حساب کاربری
-/waiter/login      ورود ویتر با کد + PIN
-/waiter            صف فراخوان‌ها + میزها
-/waiter/order/:id  فرم سفارش برای یک میز
-/admin/login       ورود ادمین
-/admin             مانیتور زنده میزها
-/admin/orders      فیش‌ها
-/admin/menu        مدیریت منو
-/admin/staff       پرسنل و عملکرد
-```
+1. **مدل سه‌نقشی کاملاً مجزا (Strict Role Segregation):**
+   - **مشتری (Guest / Customer):** بدون حساب کاربری و کلمه عبور. ورود صرفاً از طریق توکن تصادفی میز (`/t/:qrToken`). دسترسی کاملاً خواندنی به منو و ثبت رویداد فراخوان ویتر.
+   - **ویتر (Waiter / Floor Staff):** ورود بدون حساب ایمیلی Supabase Auth. لاگین از طریق `code + PIN` و دریافت توکن نشست اختصاصی در جدول `staff_sessions`. ثبت سفارش سر میز، تغییر وضعیت فیش و آزادسازی میز.
+   - **مدیر (Admin / Cashier):** ورود رسمی با ایمیل و پسورد در **Supabase Auth**. احراز هویت مضاعف با رکورد فعال در جدول `public.staff` و دسترسی کامل به مانیتورینگ سالن، منو، فیش‌ها و عملکرد پرسنل.
 
-`GlobalModeBar` یک ابزار دمو است و در نسخه نهایی حذف می‌شود؛ در محیط توسعه
-می‌تواند باقی بماند ولی هرگز نباید اجازه ورود به پنل بدون احراز هویت بدهد.
+2. **الگوی امنیتی RPC-First (Zero Direct Access for Public):**
+   - به هیچ عنوان به مشتری و ویتر دسترسی مستقیم خواندن یا نوشتن روی جداول حساس داده نمی‌شود (`anon` اجازه `select/insert/update/delete` روی جداول `tables`, `orders`, `guest_requests` ندارد).
+   - تمام تراکنش‌های بیزینسی از طریق توابع رویه‌ای ذخیره‌شده با دسترسی امنیتی بالا (`SECURITY DEFINER` RPC) کنترل و اعتبارسنجی می‌شوند.
 
-## QR و هویت میز
+3. **جلوگیری از تداخل نشست‌های میز (`table_sessions`):**
+   - یک میز فیزیکی در طول روز بارها خالی و پر می‌شود.
+   - شناسه میز ثابت است اما مهمانان با یکدیگر متفاوتند. تمام فیش‌ها، درخواست‌ها و زمان‌بندی‌ها به نشست فعال (`table_sessions` با وضعیت `open`) متصل می‌شوند.
+   - بستن حساب میز (`close_table`) نشست را مختومه و میز را برای گروه بعدی آزاد می‌کند.
 
-- `tables.qr_token` رشته تصادفی ۱۸ کاراکتری است، **نه شماره میز**.
-- QR چاپی فقط توکن را در خود دارد؛ باطل‌کردن QR = تولید توکن جدید.
-- مشتری با باز کردن `/t/:token` یک RPC صدا می‌زند که:
-  1. میز را با توکن پیدا می‌کند،
-  2. اگر نشست باز ندارد، یکی ایجاد می‌کند (`table_sessions`),
-  3. شناسه نشست + منوی فعال را برمی‌گرداند.
-- دسترسی مستقیم anon به جدول‌های میز/سفارش/فراخوان بسته است. خواندن و نوشتن
-  فقط از طریق RPC انجام می‌شود تا نشود با دستکاری درخواست، سفارش میز دیگر را دید.
+4. **عدم وجود سبد خرید مستقیم برای مشتری (No Customer Direct Cart):**
+   - برای کاهش خطای ثبت سفارش، مشتری مستقیماً فیش صادر نمی‌کند؛ بلکه اقلام منو را مشاهده کرده و با زدن دکمه «فراخوان ویتر»، سالن‌کار را به میز فرا می‌خواند تا ثبت نهایی در حضور مشتری انجام شود.
 
-## نشست میز (چرا لازم است)
+---
 
-یک میز در طول روز چند بار پر و خالی می‌شود. بدون `table_sessions`:
-
-- سه گروه مهمان روی یک میز قاطی می‌شوند،
-- گزارش فروش هر ویتر غلط درمی‌آید،
-- بستن حساب یک میز، فیش‌های مهمان قبلی را هم قفل می‌کند.
-
-قاعده: **در هر لحظه حداکثر یک نشست باز برای هر میز** (partial unique index).
-تسویه = بستن نشست + آزاد شدن میز.
-
-## جریان کاری
+## ۲. نحوه ارتباط فرانت‌اند با بک‌اند و دیتابیس Supabase
 
 ```
-مشتری: منوی QR → مشاهده محصول و جزئیات (فقط خواندنی) → «فراخوان ویتر»
-   │
-   ├─ guest_requests (type=call_waiter, status=pending)
-   ▼                         socket: call:created
-ویتر: نوتیفیکیشن میز (بدون اقلام — مشتری سفارشی ثبت نکرده)
-   │  (یا خودش دستی یک میز را باز می‌کند — همان فرم)
-   ├─ انتخاب اقلام از منو
-   └─ «تایید» → orders (status=sent_to_admin) + guest_request.status=accepted
-   ▼
-ادمین: sent_to_admin → in_preparation → ready → delivered → paid
+┌────────────────────────────────────────────────────────────────────────┐
+│                              FRONTEND (SPA)                            │
+│  React 19 + TypeScript + Custom Router (HTML5 History API) + Context  │
+└───────┬───────────────────────────┬────────────────────────────┬───────┘
+        │ (1) QR / Public RPC       │ (2) PIN / RPC Token        │ (3) Supabase Auth + RLS
+        ▼                           ▼                            ▼
+┌──────────────────┐       ┌──────────────────┐         ┌────────────────────┐
+│   Guest Client   │       │   Waiter Client  │         │    Admin Client    │
+│  (Role: anon)    │       │  (Role: anon)    │         │ (Role: auth'd)     │
+└────────┬─────────┘       └────────┬─────────┘         └────────┬───────────┘
+         │                          │                            │
+         │ customer_session()       │ waiter_login()             │ supabase.auth.signIn()
+         │ create_guest_call()      │ waiter_create_order()      │ Direct Table Access
+         │ customer_state()         │ waiter_update_order()      │ via RLS (*_admin_all)
+         ▼                          ▼                            ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        SUPABASE / POSTGRESQL                           │
+│  - Row Level Security (RLS) Active                                     │
+│  - Security Definer RPCs (Bypass RLS securely with DB validation)      │
+│  - Triggers (Status Guard, Table Sync)                                 │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ Broadcast Event ('changed')
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│               REALTIME BROADCAST CHANNEL (vadoodian:board)             │
+│   فرانت‌اند به صورت زنده فقط پیام تغییر دریافت کرده و متد خود را رفرش می‌کند   │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
-نکته: مشتری سبد خرید ندارد و آیتمی ارسال نمی‌کند. پس `guest_requests.items`
-همیشه خالی می‌ماند و `type='order'` از سمت مشتری هرگز تولید نمی‌شود؛ سفارش را
-همیشه ویتر می‌سازد. مسیر «فراخوان» و مسیر «انتخاب دستی میز» به **یک کامپوننت
-سفارش‌گیری مشترک** می‌رسند و تفاوتی در محتوا ندارند.
+### الف. لایه دسترسی مشتری (`src/shared/api/customer.ts`)
+1. **ورود با توکن QR:** کلاینت متد `customer_session(p_qr_token)` را صدا می‌زند.
+2. **پاسخ سرور:** اگر میز معتبر باشد، یک نشست باز (`table_sessions`) ایجاد یا خوانده شده و یک `guest_token` ۱۸ بایتی به مرورگر بازگردانده و در `localStorage` ذخیره می‌شود.
+3. **دریافت وضعیت:** کلاینت به صورت متناوب یا با پیام‌های ریل‌تایم، متد `customer_state(guest_token)` را فراخوانی کرده و وضعیت فعلی میز، فراخوان‌های در جریان و فیش‌های ثبت‌شده را دریافت می‌نماید.
+4. **فراخوان ویتر:** متد `create_guest_call(guest_token, type, note)` رکورد درخواست جدید را بدون اجازه دسترسی مستقیم به جدول `guest_requests` درج می‌کند.
 
-### وضعیت‌ها
+### ب. لایه دسترسی ویتر (`src/shared/api/waiter.ts`)
+1. **ورود با پین:** متد `waiter_login(code, pin)` اجرا می‌شود. سرور پین را با `crypt(pin, pin_hash)` اعتبارسنجی می‌کند. پس از ۵ تلاش اشتباه، برای ۱۵ دقیقه قفل نرخ (Rate-limit) اعمال می‌شود.
+2. **توکن نشست موقت:** یک رکورد با اعتبار ۱۶ ساعته در `staff_sessions` ثبت شده و توکن ۳۲ بایتی به کلاینت تحویل می‌گردد (`vadoodian_waiter_token`).
+3. **عملیات سالن:** کلیه اقدامات ویتر با ارسال توکن انجام می‌شود:
+   - `waiter_state(token)`: دریافت اطلاعات تمام میزهای فعال، صف فراخوان‌ها، سفارشات و آمار روزانه.
+   - `waiter_open_table(token, tableNumber)`: باز کردن دستی میز.
+   - `waiter_create_order(token, tableNumber, items, note)`: استعلام قیمت لحظه‌ای اقلام از جدول `menu_items` سمت دیتابیس (جلوگیری از دستکاری قیمت در کلاینت)، محاسبه ۱۰٪ حق سرویس، درج رکورد `orders` و رکوردهای `order_items` و بستن فراخوان‌های باز آن میز.
+   - `waiter_update_order_status(token, orderId, status)`: تغییر وضعیت سفارش.
+   - `waiter_close_table(token, tableNumber)`: تسویه حساب، تغییر وضعیت نشست به `closed` و آزاد کردن میز (`free`).
 
-| موجودیت | مقادیر مجاز |
-|---|---|
-| `guest_requests.status` | `pending` → `seen` → `accepted` / `rejected` / `expired` |
-| `orders.status` | `sent_to_admin` → `in_preparation` → `ready` → `delivered` → `paid`، با `cancelled` از هر مرحله قبل از `paid` |
-| `tables.status` | `free` · `active` · `calling` · `bill_requested` |
-| `table_sessions.status` | `open` · `closed` |
+### ج. لایه دسترسی مدیر (`src/shared/api/admin.ts`)
+1. **احراز هویت استاندارد:** ادمین با متد `supabase.auth.signInWithPassword()` وارد می‌شود.
+2. **بررسی گارد دسترسی:** تابع دیتابیسی `public.is_admin()` بررسی می‌کند که کاربر لاگین‌شده حتماً در جدول `public.staff` با ستون `role = 'admin'` و `is_active = true` ثبت شده باشد.
+3. **سیاست‌های RLS مستقیم:** طبق پالیسی‌های مایگریشن `0003_admin_auth.sql`، ادمین تاییدشده دسترسی کامل خواندن و نوشتن روی تمام جداول سامانه دارد.
 
-گذارهای وضعیت سفارش باید در یک trigger دیتابیس اعتبارسنجی شوند تا UI و API
-نتوانند وضعیت غیرمجاز بسازند (مثلاً `paid` مستقیم از `sent_to_admin`).
+### د. معماری همگام‌سازی بلادرنگ (Realtime Board)
+برای پرهیز از افشای مستقیم داده‌های حساس روی وب‌سوکت عمومی:
+- کانال broadcast ساده به نام `vadoodian:board` تعریف شده است (`src/shared/realtime/board.ts`).
+- هنگام هر تغییر مهم (ثبت سفارش، تغییر وضعیت، فراخوان ویتر)، رویداد `{ event: 'changed' }` ارسال می‌شود.
+- کلاینت‌های شنونده به محض دریافت سیگنال، متد اختصاصی رول خود (`waiter_state` یا `customer_state`) را صدا زده و داده‌های جدید و امن خود را واکشی می‌کنند.
 
-## ساختار پوشه‌ها (هدف)
+---
+
+## ۳. مسیریابی و ساختار صفحات (Routing Architecture)
+
+سامانه از یک روتر سبک و پایدار مبتنی بر History API مرورگر (`src/shared/router.ts`) استفاده می‌کند. این روتر مسیرهای زیر را پوشش می‌دهد:
 
 ```
-src/
-├─ app/
-│  ├─ router.tsx
-│  └─ providers.tsx          Auth + Realtime + UI
-├─ features/
-│  ├─ customer/  pages · components · hooks
-│  ├─ waiter/    pages · components · hooks
-│  └─ admin/     pages · components
-├─ entities/     table · order · menu · call · waiter   (model + api + status)
-└─ shared/       api/client · realtime · ui · lib(persian, money)
+┌─────────────────────────────────┬───────────────────┬────────────────────────────────────────────┐
+│ آدرس مسیر                       │ نام Route در تایپ │ کامپوننت متناظر                            │
+├─────────────────────────────────┼───────────────────┼────────────────────────────────────────────┤
+│ /                               │ home              │ LandingPage                                │
+│ /t/:qrToken                     │ customer          │ CustomerGate (CustomerMenu / Detail)       │
+│ /waiter/login                   │ waiter-login      │ WaiterPinLogin                             │
+│ /waiter                         │ waiter-workspace  │ WaiterWorkspace                            │
+│ /waiter/order/:tableNumber      │ waiter-order      │ WaiterOrderTaking                          │
+│ /admin/login                    │ admin-login       │ AdminLogin                                 │
+│ /admin                          │ admin-live        │ AdminLayout > LiveTablesMonitoring         │
+│ /admin/orders                   │ admin-orders      │ AdminLayout > OrdersList                   │
+│ /admin/orders/:orderId          │ admin-order       │ AdminLayout > OrderDetailView              │
+│ /admin/menu                     │ admin-menu        │ AdminLayout > MenuManagement               │
+│ /admin/menu/:productId          │ admin-product     │ AdminLayout > ProductEditForm              │
+│ /admin/staff                    │ admin-staff       │ AdminLayout > StaffPerformance             │
+└─────────────────────────────────┴───────────────────┴────────────────────────────────────────────┘
 ```
 
-## شکستن Context فعلی
+---
 
-`src/context/AppContext.tsx` الان همه‌چیز است. جایگزین:
+## ۴. مدیریت وضعیت‌ها و کامپوننت‌های اصلی
 
-| مسئولیت | مقصد |
-|---|---|
-| نقش/هویت کاربر | `AuthProvider` |
-| داده‌های سرور + اتصال socket | `RealtimeProvider` (React Query + Supabase channel) |
-| توست/مودال‌های UI | `UIContext` |
-| `toPersianDigits` / `formatPrice` | `shared/lib/persian.ts` |
+### الف. استیت مرکزی (`AppContext.tsx`)
+وضعیت‌های سراسری نرم‌افزار در `src/context/AppContext.tsx` نگهداری می‌شوند:
+- **احراز هویت ادمین:** `adminSession`, `adminAuthLoading`, `adminView`
+- **احراز هویت ویتر:** `waiterSession`, `waiterAuthLoading`, `waiterView`
+- **نشست مشتری:** `customerSession`, `customerLoading`, `customerError`, `customerView`
+- **کاتالوگ منو:** `menuItems`, `categories`, `activeCategory`
+- **وضعیت زنده سالن:** `tables`, `orders`, `waiterCalls`, `stats`
+- **پیام‌های سیستم:** سیستم توست سراسری (`showToast`, `toast`)
 
-> سبد خرید مشتری حذف شده است (نه در context و نه در UI). تنها اکشن سمت مشتری
-> «فراخوان ویتر» است.
+### ب. سلسله‌مراتب کامپوننت‌ها (Component Hierarchy)
 
-## نقشه انتقال فایل‌های فعلی
+```
+App
+├── GlobalModeBar (فقط محیط توسعه با ?demo=1)
+├── LandingPage (در مسیر ریشه /)
+├── CustomerGate (در مسیر /t/:qrToken)
+│   ├── CustomerMenu (مشاهده لیست دسته‌ها و کارت‌های محصول)
+│   ├── CustomerItemDetail (مشاهده تصویر بزرگ، ترکیبات و داستان محصول)
+│   └── CallWaiterFloatingModal (مودال فراخوان ویتر)
+├── Waiter Section (در مسیرهای /waiter/*)
+│   ├── WaiterPinLogin (صفحه‌کلید لمسی ورود پین)
+│   ├── WaiterWorkspace (داشبورد سالن: فیلتر میزها، کارت‌های فراخوان)
+│   ├── WaiterOrderTaking (فرم سفارش‌گیری سر میز با منوی سریع)
+│   ├── OrderConfirmModal (تایید اقلام، مشاهده جمع کل و ارسال به صندوق)
+│   └── WaiterProfileModal (خروج و مشاهده آمار شیفت)
+└── Admin Section (در مسیرهای /admin/*)
+    ├── AdminLogin (فرم ورود ایمیل و پسورد)
+    └── AdminLayout (سایدبار دسکتاپ و نوار ناوبری موبایل)
+        ├── LiveTablesMonitoring (دید کلی به سالن، وضعیت میزها و زمان اقامت)
+        ├── OrdersList (فیلتر فیش‌ها بر اساس وضعیت و تسویه‌حساب)
+        ├── OrderDetailView (چاپ یا مشاهده ریز اقلام فیش)
+        ├── MenuManagement (افزودن و ویرایش دسته‌ها و اقلام)
+        ├── ProductEditForm (ویرایش تصویر، ترکیبات و قیمت محصول)
+        └── StaffPerformance (تعداد سفارش‌ها و ثبت ویتر جدید)
+```
 
-| فعلی | مقصد |
-|---|---|
-| `components/customer/CustomerMenu.tsx` | `features/customer/pages/MenuPage.tsx` |
-| `components/customer/CustomerItemDetail.tsx` | `features/customer/pages/ItemPage.tsx` |
-| `components/customer/CustomerQuickGrid.tsx` | حذف/ادغام در MenuPage |
-| `components/waiter/WaiterWorkspace.tsx` | `features/waiter/pages/TablesPage.tsx` |
-| `components/waiter/WaiterOrderTaking.tsx` | `features/waiter/pages/OrderComposerPage.tsx` |
-| `components/waiter/OrderConfirmModal.tsx` | `features/waiter/components/ConfirmOrderDialog.tsx` |
-| `components/admin/AdminLayout.tsx` | `features/admin/components/AdminShell.tsx` |
-| `components/admin/LiveTablesMonitoring.tsx` | `features/admin/pages/LiveTablesPage.tsx` |
-| بقیه فایل‌های admin | مطابق نام، داخل `features/admin/pages` |
+---
 
-## کانال‌های Realtime
+## ۵. قوانین و استانداردهای کدنویسی جهت نگهداشت و توسعه AI
 
-| کانال/رویداد | منتشرکننده | مصرف‌کننده |
-|---|---|---|
-| `call:created` | مشتری (RPC) | ویترها |
-| `call:accepted` / `call:resolved` | ویتر | مشتری همان میز |
-| `order:created` | ویتر | ادمین |
-| `order:status` | ادمین | ویتر + مشتری |
-| `table:updated` | دیتابیس | ادمین (Live Tables) |
+مدل‌های هوش مصنوعی و توسعه‌دهندگان باید استانداردهای زیر را در تمامی فایل‌های این پروژه رعایت نمایند:
 
-اتاق‌ها: `table:{id}`، `waiters`، `admin`.
+1. **مرجع یگانه حقیقت (Single Source of Truth):**
+   - تمامی انواع داده در `src/types/index.ts` تعریف می‌شوند. از ساخت تایپ‌های موازی و تکراری خودداری شود.
+   - مپینگ ساختار دیتابیس به کمل‌کیس منحصراً در `src/shared/api/mappers.ts` انجام شود.
 
-## امنیت
+2. **ایزولاسیون فراخوانی‌های دیتابیس:**
+   - کامپوننت‌های UI نباید به صورت مستقیم کوئری SQL یا کلاینت خام `supabase.from()` را فراخوانی کنند.
+   - تمام تراکنش‌ها باید از طریق توابع ماژولار در پوشه `src/shared/api/` صورت گیرد.
 
-- PIN ویتر با `argon2`/`bcrypt` هش می‌شود؛ هیچ‌وقت در پاسخ API برنمی‌گردد.
-- ورود با کد+پین از طریق Edge Function انجام می‌شود؛ بعد از ۵ تلاش ناموفق،
-  کد موقتاً قفل می‌شود.
-- نشست ادمین/ویتر با توکن Supabase Auth مدیریت می‌شود؛ نقش در `staff.role`.
-- RLS روشن است؛ نقش `anon` به هیچ جدولی جز منوی عمومی دسترسی ندارد.
-- `service_role` فقط سمت سرور.
+3. **رعایت RTL و بومی‌سازی تقویم و ارقام:**
+   - رابط کاربری به صورت کامل راست‌به‌چپ (`dir="rtl"`) و با تایپوگرافی فارسی طراحی شده است.
+   - برای نمایش اعداد در UI، همواره از تابع تبدیل ارقام فارسی و فرمت استاندارد قیمت به تومان استفاده شود.
 
-## فازهای اجرا
+4. **تغییرناپذیری فیش‌های صادرشده (Snapshot Preservation):**
+   - در صورت تغییر قیمت یا عنوان یک محصول در منو، فیش‌های قبلی نباید دستخوش تغییر شوند. جدول `order_items` اطلاعات قیمت و نام را در زمان سفارش فریز (Snapshot) می‌کند.
 
-| فاز | کار | معیار پذیرش |
-|---|---|---|
-| ۰ | روتر + شکستن Context + `shared/` — **بدون تغییر رفتار** | ظاهر و جریان فعلی عیناً کار می‌کند |
-| ۱ | پروژه Supabase + اسکیما + seed منو | منو از دیتابیس خوانده می‌شود |
-| ۲ | QR و نشست میز | هر QR به میز درست می‌رسد، نشست تکراری ساخته نمی‌شود |
-| ۳ | فراخوان realtime | فراخوان زیر ۲ ثانیه روی تبلت ویتر ظاهر می‌شود |
-| ۴ | مشتری → ویتر → ادمین | فیش تاییدشده بدون رفرش در پنل ادمین دیده می‌شود |
-| ۵ | احراز هویت واقعی | ورود بدون PIN/پسورد غیرممکن است |
-
-هر فاز جدا commit می‌شود. فاز ۰ و ۱ هم‌زمان انجام نمی‌شوند.
-
-## باز مانده (TBD)
-
-- تبدیل `initialData.ts` به `supabase/seed.sql`
-- طراحی برگه چاپ QR برای هر میز
-- روش تسویه: POS بیرونی یا پرداخت آنلاین
-- سیاست نگهداری داده (حذف فیش‌های قدیمی)
+5. **گاردهای گذار وضعیت (State Transition Integrity):**
+   - مراحل سفارش (`orders.status`) یک‌طرفه و تحت کنترل تریگر دیتابیس هستند:
+     `sent_to_admin` → `in_preparation` → `ready` → `delivered` → `paid`
+   - هیچ کامپوننتی نباید تلاش کند سفارشی را از `sent_to_admin` مستقیماً به `paid` تغییر دهد (موجب خطای `check_violation` خواهد شد).

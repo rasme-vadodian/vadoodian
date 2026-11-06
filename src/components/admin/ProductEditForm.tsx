@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { CategoryId, MenuItem } from '../../types';
+import { MenuItem } from '../../types';
 
 export const ProductEditForm: React.FC = () => {
   const {
     products,
+    categories,
     selectedProductId,
     saveProduct,
     deleteProduct,
@@ -17,7 +18,7 @@ export const ProductEditForm: React.FC = () => {
 
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
-  const [category, setCategory] = useState<CategoryId>('hot');
+  const [category, setCategory] = useState<string>('hot');
   const [price, setPrice] = useState('85000');
   const [ingredients, setIngredients] = useState('');
   const [story, setStory] = useState('');
@@ -179,26 +180,23 @@ export const ProductEditForm: React.FC = () => {
             <div className="flex flex-col gap-2">
               <label className="text-base font-bold text-[#1E1B18]">دسته‌بندی اصلی منو *</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { id: 'hot', label: 'نوشیدنی گرم', icon: 'local_cafe' },
-                  { id: 'cold', label: 'نوشیدنی سرد', icon: 'water_drop' },
-                  { id: 'snack', label: 'میان‌وعده', icon: 'lunch_dining' },
-                  { id: 'dessert', label: 'کیک و دسر', icon: 'cake' }
-                ].map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setCategory(cat.id as CategoryId)}
-                    className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-1 text-center transition-all cursor-pointer ${
-                      category === cat.id
-                        ? 'bg-[#002252] text-white border-[#002252] shadow-sm'
-                        : 'bg-[#FAF2EC] text-[#6E6B67] border-[#EADBCE] hover:bg-white hover:text-[#002252]'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-2xl">{cat.icon}</span>
-                    <span className="text-base font-bold">{cat.label}</span>
-                  </button>
-                ))}
+                {categories
+                  .filter((cat) => cat.isActive)
+                  .map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setCategory(cat.id)}
+                      className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-1 text-center transition-all cursor-pointer ${
+                        category === cat.id
+                          ? 'bg-[#002252] text-white border-[#002252] shadow-sm'
+                          : 'bg-[#FAF2EC] text-[#6E6B67] border-[#EADBCE] hover:bg-white hover:text-[#002252]'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-2xl">{cat.icon}</span>
+                      <span className="text-base font-bold">{cat.name}</span>
+                    </button>
+                  ))}
               </div>
             </div>
 

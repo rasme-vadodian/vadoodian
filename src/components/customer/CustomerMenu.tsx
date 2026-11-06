@@ -5,42 +5,46 @@ import { MenuItem } from '../../types';
 export const CustomerMenu: React.FC = () => {
   const {
     products,
+    categories,
+    customerSession,
+    customerCall,
     setSelectedProductId,
     setCustomerView,
     callWaiter,
     callWaiterModalOpen,
     setCallWaiterModalOpen,
     toPersianDigits,
-    formatPrice,
-    showToast
+    formatPrice
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [reservationGuests, setReservationGuests] = useState('۲ تا ۴ نفر');
-  const [reservationDate, setReservationDate] = useState('امروز، پذیرایی عصرانه');
 
   // Specialties
-  const specialties = products.filter((p) => p.isFeatured);
+  const specialties = products.filter((p) => p.isFeatured && p.isAvailable);
 
-  // Grouped products
-  const hotItems = products.filter((p) => p.category === 'hot');
-  const coldItems = products.filter((p) => p.category === 'cold');
-  const snackItems = products.filter((p) => p.category === 'snack');
-  const dessertItems = products.filter((p) => p.category === 'dessert');
+  const activeCategories = categories.filter((cat) => cat.isActive);
+
+  const matchesSearch = (item: MenuItem) => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      item.name.toLowerCase().includes(q) ||
+      item.ingredients.toLowerCase().includes(q) ||
+      item.code.toLowerCase().includes(q)
+    );
+  };
 
   const handleCallWaiter = () => {
-    callWaiter(4, 'میز ۴ (شاه‌نشین حیاط)');
-    setCallWaiterModalOpen(true);
+    if (customerCall) {
+      setCallWaiterModalOpen(true);
+      return;
+    }
+    callWaiter(customerSession?.tableNumber ?? 0, customerSession?.tableName);
   };
 
   const handleOpenItem = (id: string) => {
     setSelectedProductId(id);
     setCustomerView('customer_item_detail');
-  };
-
-  const handleReservationSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    showToast('رزرو میز ثبت شد', `درخواست رزرو شما برای ${reservationGuests} در تاریخ ${reservationDate} دریافت گردید. همکاران ما با شما تماس خواهند گرفت.`);
   };
 
   const renderProductItem = (item: MenuItem) => {
@@ -103,7 +107,9 @@ export const CustomerMenu: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <h1 className="text-2xl font-bold text-[#002252] leading-none">کافه و موزه تاریخی ودودیان</h1>
-              <span className="text-xs text-[#835428] font-bold mt-1">منوی دیجیتال • میز ۴ شاه‌نشین حیاط</span>
+              <span className="text-xs text-[#835428] font-bold mt-1">
+                منوی دیجیتال • {customerSession ? customerSession.tableName : 'میز مهمان'}
+              </span>
             </div>
           </div>
 
@@ -169,61 +175,38 @@ export const CustomerMenu: React.FC = () => {
               <span className="material-symbols-outlined text-[#002252] text-xl">menu_book</span>
               <h3 className="text-xl font-bold text-[#002252]">دسته‌بندی‌های عمارت</h3>
             </div>
-            <span className="text-xs text-[#835428] font-bold">۴ رسته پذیرایی</span>
+            <span className="text-xs text-[#835428] font-bold">
+              {toPersianDigits(activeCategories.length)} رسته پذیرایی
+            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
-            <a
-              href="#cat-hot"
-              className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#FAF2EC] border border-[#BD8655]/30 hover:border-[#002252] shadow-xs active:scale-98 transition-transform"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#002252]/10 flex items-center justify-center shrink-0 text-[#002252]">
-                <span className="material-symbols-outlined text-2xl">local_cafe</span>
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-lg font-bold text-[#002252] leading-tight truncate">نوشیدنی و خوراک گرم</span>
-                <span className="text-xs text-[#6E6B67]">انواع قهوه و دمنوش</span>
-              </div>
-            </a>
-
-            <a
-              href="#cat-cold"
-              className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#FAF2EC] border border-[#BD8655]/30 hover:border-[#002252] shadow-xs active:scale-98 transition-transform"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#BD8655]/15 flex items-center justify-center shrink-0 text-[#BD8655]">
-                <span className="material-symbols-outlined text-2xl">emoji_food_beverage</span>
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-lg font-bold text-[#002252] leading-tight truncate">نوشیدنی و خوراک سرد</span>
-                <span className="text-xs text-[#6E6B67]">شربت‌خانه و بار سرد</span>
-              </div>
-            </a>
-
-            <a
-              href="#cat-snacks"
-              className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#FAF2EC] border border-[#BD8655]/30 hover:border-[#002252] shadow-xs active:scale-98 transition-transform"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#002252]/10 flex items-center justify-center shrink-0 text-[#002252]">
-                <span className="material-symbols-outlined text-2xl">bakery_dining</span>
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-lg font-bold text-[#002252] leading-tight truncate">میان‌وعده و سبک</span>
-                <span className="text-xs text-[#6E6B67]">لقمه‌های عمارتی</span>
-              </div>
-            </a>
-
-            <a
-              href="#cat-pastry"
-              className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#FAF2EC] border border-[#BD8655]/30 hover:border-[#002252] shadow-xs active:scale-98 transition-transform"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#BD8655]/15 flex items-center justify-center shrink-0 text-[#BD8655]">
-                <span className="material-symbols-outlined text-2xl">cake</span>
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-lg font-bold text-[#002252] leading-tight truncate">کیک و شیرینی</span>
-                <span className="text-xs text-[#6E6B67]">دست‌پخت روز مطبخ</span>
-              </div>
-            </a>
+            {activeCategories.map((cat, index) => (
+              <a
+                key={cat.id}
+                href={`#cat-${cat.id}`}
+                className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#FAF2EC] border border-[#BD8655]/30 hover:border-[#002252] shadow-xs active:scale-98 transition-transform"
+              >
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    index % 2 === 0 ? 'bg-[#002252]/10 text-[#002252]' : 'bg-[#BD8655]/15 text-[#BD8655]'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-2xl">{cat.icon}</span>
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-lg font-bold text-[#002252] leading-tight truncate">{cat.name}</span>
+                  <span className="text-xs text-[#6E6B67]">
+                    {toPersianDigits(cat.itemCount)} قلم
+                  </span>
+                </div>
+              </a>
+            ))}
+            {activeCategories.length === 0 && (
+              <p className="col-span-2 text-center text-sm text-[#6E6B67] py-3">
+                دسته‌بندی فعالی ثبت نشده است.
+              </p>
+            )}
           </div>
         </section>
 
@@ -273,122 +256,53 @@ export const CustomerMenu: React.FC = () => {
         </section>
 
         {/* Categories Catalog */}
-        {/* 1. Hot Drinks & Food */}
-        <section className="flex flex-col gap-3 pt-2" id="cat-hot">
-          <div className="flex items-center justify-between pb-1.5 border-b border-[#BD8655]/30">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#002252]"></span>
-              <h3 className="text-2xl font-bold text-[#002252]">نوشیدنی و خوراک گرم</h3>
-            </div>
-            <span className="text-xs text-[#6E6B67]">{toPersianDigits(hotItems.length)} مورد</span>
-          </div>
-          <div className="flex flex-col gap-3">
-            {hotItems.map(renderProductItem)}
-          </div>
-        </section>
+        {activeCategories.map((cat, index) => {
+          const items = products.filter(
+            (p) => p.category === cat.id && matchesSearch(p)
+          );
+          return (
+            <section className="flex flex-col gap-3 pt-2" key={cat.id} id={`cat-${cat.id}`}>
+              <div className="flex items-center justify-between pb-1.5 border-b border-[#BD8655]/30">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full ${
+                      index % 2 === 0 ? 'bg-[#002252]' : 'bg-[#BD8655]'
+                    }`}
+                  ></span>
+                  <h3 className="text-2xl font-bold text-[#002252]">{cat.name}</h3>
+                </div>
+                <span className="text-xs text-[#6E6B67]">
+                  {toPersianDigits(items.length)} مورد
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {items.length === 0 ? (
+                  <p className="text-sm text-[#6E6B67] bg-white border border-[#EADBCE] rounded-2xl p-4 text-center">
+                    قلمی در این دسته یافت نشد.
+                  </p>
+                ) : (
+                  items.map(renderProductItem)
+                )}
+              </div>
+            </section>
+          );
+        })}
 
-        {/* 2. Cold Drinks (Sharbat-khane) */}
-        <section className="flex flex-col gap-3 pt-4" id="cat-cold">
-          <div className="flex items-center justify-between pb-1.5 border-b border-[#BD8655]/30">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#BD8655]"></span>
-              <h3 className="text-2xl font-bold text-[#002252]">نوشیدنی و خوراک سرد (شربت‌خانه)</h3>
-            </div>
-            <span className="text-xs text-[#6E6B67]">{toPersianDigits(coldItems.length)} مورد</span>
-          </div>
-          <div className="flex flex-col gap-3">
-            {coldItems.map(renderProductItem)}
-          </div>
-        </section>
-
-        {/* 3. Snacks & Light Fare */}
-        <section className="flex flex-col gap-3 pt-4" id="cat-snacks">
-          <div className="flex items-center justify-between pb-1.5 border-b border-[#BD8655]/30">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#002252]"></span>
-              <h3 className="text-2xl font-bold text-[#002252]">میان‌وعده و خوراک سبک</h3>
-            </div>
-            <span className="text-xs text-[#6E6B67]">{toPersianDigits(snackItems.length)} مورد</span>
-          </div>
-          <div className="flex flex-col gap-3">
-            {snackItems.map(renderProductItem)}
-          </div>
-        </section>
-
-        {/* 4. Pastries & Desserts */}
-        <section className="flex flex-col gap-3 pt-4" id="cat-pastry">
-          <div className="flex items-center justify-between pb-1.5 border-b border-[#BD8655]/30">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#BD8655]"></span>
-              <h3 className="text-2xl font-bold text-[#002252]">کیک و شیرینی دست‌پخت عمارت</h3>
-            </div>
-            <span className="text-xs text-[#6E6B67]">{toPersianDigits(dessertItems.length)} مورد</span>
-          </div>
-          <div className="flex flex-col gap-3">
-            {dessertItems.map(renderProductItem)}
-          </div>
-        </section>
-
-        {/* Reservation Section (Image 26) */}
+        {/* Table Service Guide */}
         <section className="mt-4 mb-6">
-          <div className="flex items-center gap-2 mb-3 px-1">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#BD8655]"></div>
-            <h3 className="text-xl font-bold text-[#002252]">رزرو میز و همنشینی در عمارت</h3>
-          </div>
-
-          <form
-            onSubmit={handleReservationSubmit}
-            className="bg-[#FAF2EC] border-2 border-[#002252]/20 rounded-2xl p-5 shadow-xs flex flex-col gap-3.5"
-          >
+          <div className="bg-[#FAF2EC] border-2 border-[#002252]/20 rounded-2xl p-5 shadow-xs flex flex-col gap-3">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#835428] text-white flex items-center justify-center shrink-0 shadow-xs">
-                <span className="material-symbols-outlined text-2xl">table_restaurant</span>
+                <span className="material-symbols-outlined text-2xl">room_service</span>
               </div>
               <div className="flex flex-col">
-                <h4 className="text-lg font-bold text-[#002252]">تجربه همنشینی در فضای تاریخی</h4>
+                <h4 className="text-lg font-bold text-[#002252]">سفارش با مهماندار سر میز</h4>
                 <p className="text-xs text-[#6E6B67] leading-relaxed mt-0.5">
-                  برای برگزاری دورهمی‌های خانوادگی، کاری یا پذیرایی اختصاصی در تالار آینه و حیاط اندرونی.
+                  برای ثبت سفارش، دکمه «فراخوانی مهماندار» را لمس کنید. مهماندار با تبلت
+                  سفارش شما را ثبت می‌کند و فیش در همان لحظه برای مدیریت ارسال می‌شود.
                 </p>
               </div>
             </div>
-
-            <div className="grid grid-cols-2 gap-3 mt-1">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#002252]">تاریخ و نوبت:</label>
-                <select
-                  value={reservationDate}
-                  onChange={(e) => setReservationDate(e.target.value)}
-                  className="bg-white border border-[#EADBCE] rounded-xl px-2.5 py-2 text-sm text-[#1E1B18] font-bold outline-none"
-                >
-                  <option value="امروز، پذیرایی عصرانه">امروز، عصرانه (۱۶ تا ۲۰)</option>
-                  <option value="امروز، پذیرایی شام">امروز، شام (۲۰ تا ۲۴)</option>
-                  <option value="فردا، پذیرایی صبحانه">فردا، صبحانه (۰۸ تا ۱۲)</option>
-                  <option value="فردا، پذیرایی عصرانه">فردا، عصرانه (۱۶ تا ۲۰)</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#002252]">تعداد مهمانان:</label>
-                <select
-                  value={reservationGuests}
-                  onChange={(e) => setReservationGuests(e.target.value)}
-                  className="bg-white border border-[#EADBCE] rounded-xl px-2.5 py-2 text-sm text-[#1E1B18] font-bold outline-none"
-                >
-                  <option value="۲ نفر">۲ نفر (میز ۲ نفره)</option>
-                  <option value="۲ تا ۴ نفر">۲ تا ۴ نفر (شاه‌نشین)</option>
-                  <option value="۶ نفر">۶ نفر (تالار آینه)</option>
-                  <option value="۸ تا ۱۲ نفر">۸ تا ۱۲ نفر (گروهی)</option>
-                </select>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#002252] text-white hover:bg-[#00377B] font-bold text-base flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-xl text-[#F8BA84]">event_available</span>
-              <span>ثبت درخواست رزرو میز</span>
-            </button>
 
             <div className="flex items-center justify-between pt-2 border-t border-[#EADBCE] text-xs text-[#6E6B67]">
               <span className="flex items-center gap-1">
@@ -399,7 +313,7 @@ export const CustomerMenu: React.FC = () => {
                 ۰۲۱-۳۳۹۰۰۰۰۰
               </a>
             </div>
-          </form>
+          </div>
         </section>
 
         {/* Footer Emblem */}
@@ -421,7 +335,7 @@ export const CustomerMenu: React.FC = () => {
             notifications_active
           </span>
           <span className="text-xl font-bold tracking-wide">
-            فراخوانی مهماندار
+            {customerCall ? 'درخواست شما در حال بررسی است' : 'فراخوانی مهماندار'}
           </span>
         </button>
       </aside>
@@ -441,7 +355,9 @@ export const CustomerMenu: React.FC = () => {
             </div>
             <h3 className="text-2xl font-bold text-[#002252]">مهماندار فراخوانده شد</h3>
             <p className="text-base text-[#6E6B67] leading-relaxed">
-              پیام شما ثبت شد. مهماندار عمارت ودودیان تا لحظاتی دیگر جهت ثبت سفارش بر سر میز شما حاضر خواهد شد.
+              {customerCall
+                ? 'درخواست شما ثبت شده و در صف مهمانداران قرار دارد. به‌محض پذیرش، مهماندار بر سر میز حاضر می‌شود.'
+                : 'پیام شما ثبت شد. مهماندار عمارت ودودیان تا لحظاتی دیگر جهت ثبت سفارش بر سر میز شما حاضر خواهد شد.'}
             </p>
             <button
               type="button"

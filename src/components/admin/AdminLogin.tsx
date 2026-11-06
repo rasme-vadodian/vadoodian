@@ -2,21 +2,27 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 
 export const AdminLogin: React.FC = () => {
-  const { setAdminView, showToast } = useApp();
-  const [username, setUsername] = useState('مدیر شیفت');
-  const [password, setPassword] = useState('••••••••');
+  const { setAdminView, showToast, loginAdmin, adminSession } = useApp();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      showToast('ورود موفق', 'خوش آمدید! دسترسی کل به پنل مدیریت عمارت فعال گردید.');
-      setAdminView('live_tables');
-    }, 600);
+    const result = await loginAdmin(email, password);
+    setIsLoading(false);
+
+    if (!result.ok) {
+      setError(result.message ?? 'ورود ناموفق بود.');
+      return;
+    }
+
+    showToast('ورود موفق', 'خوش آمدید! دسترسی مدیریت عمارت فعال گردید.');
   };
 
   return (
@@ -51,21 +57,38 @@ export const AdminLogin: React.FC = () => {
           </div>
 
           {/* Form */}
+          {adminSession && (
+            <div className="mt-6 rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-sm text-emerald-800 flex items-center justify-between gap-3">
+              <span className="leading-relaxed">
+                با حساب {adminSession.email} وارد شده‌اید.
+              </span>
+              <button
+                type="button"
+                onClick={() => setAdminView('live_tables')}
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-emerald-700 text-white font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+              >
+                داشبورد
+              </button>
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="mt-8 space-y-4">
             <div className="space-y-1.5">
-              <label className="text-base text-[#1E1B18] flex items-center gap-1.5 font-bold" htmlFor="username">
-                <span className="material-symbols-outlined text-lg text-[#BD8655]">badge</span>
-                <span>نام کاربری یا شناسه پرسنلی</span>
+              <label className="text-base text-[#1E1B18] flex items-center gap-1.5 font-bold" htmlFor="email">
+                <span className="material-symbols-outlined text-lg text-[#BD8655]">mail</span>
+                <span>ایمیل مدیر</span>
               </label>
               <div className="relative">
                 <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="مثال: مدیر شیفت"
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@example.com"
+                  autoComplete="username"
+                  dir="ltr"
                   required
-                  className="w-full bg-[#FAF2EC] text-[#1E1B18] text-base rounded-xl pr-10 pl-4 py-3 outline-none focus:bg-white focus:border-[#002252] border border-[#EADBCE] transition-all font-bold"
+                  className="w-full bg-[#FAF2EC] text-[#1E1B18] text-base rounded-xl pr-10 pl-4 py-3 outline-none focus:bg-white focus:border-[#002252] border border-[#EADBCE] transition-all font-bold text-left"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#BD8655]">
                   <span className="material-symbols-outlined text-xl">person</span>
@@ -85,8 +108,10 @@ export const AdminLogin: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="رمز عبور خود را وارد کنید"
+                  autoComplete="current-password"
+                  dir="ltr"
                   required
-                  className="w-full bg-[#FAF2EC] text-[#1E1B18] text-base rounded-xl pr-10 pl-10 py-3 outline-none focus:bg-white focus:border-[#002252] border border-[#EADBCE] transition-all font-bold"
+                  className="w-full bg-[#FAF2EC] text-[#1E1B18] text-base rounded-xl pr-10 pl-10 py-3 outline-none focus:bg-white focus:border-[#002252] border border-[#EADBCE] transition-all font-bold text-left"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#BD8655]">
                   <span className="material-symbols-outlined text-xl">key</span>
@@ -104,22 +129,30 @@ export const AdminLogin: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between pt-1 text-sm">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="w-4 h-4 rounded text-[#002252] accent-[#002252] cursor-pointer"
-                />
-                <span className="text-[#6E6B67]">مرا به خاطر بسپار</span>
-              </label>
+              <span className="flex items-center gap-1.5 text-[#6E6B67]">
+                <span className="material-symbols-outlined text-base text-[#BD8655]">verified_user</span>
+                <span>ورود امن با Supabase Auth</span>
+              </span>
               <button
                 type="button"
-                onClick={() => showToast('راهنما', 'رمز عبور پیش‌فرض برای مدیر فعال است.')}
+                onClick={() =>
+                  showToast(
+                    'بازیابی رمز',
+                    'رمز عبور را از داشبورد Supabase → Authentication → Users بازنشانی کنید یا با مدیر سیستم تماس بگیرید.'
+                  )
+                }
                 className="text-[#835428] font-bold hover:underline cursor-pointer"
               >
                 فراموشی رمز؟
               </button>
             </div>
+
+            {error && (
+              <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">
+                <span className="material-symbols-outlined text-lg shrink-0">error</span>
+                <span>{error}</span>
+              </div>
+            )}
 
             <button
               type="submit"

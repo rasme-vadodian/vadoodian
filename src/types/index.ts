@@ -4,7 +4,7 @@ export interface MenuItem {
   id: string;
   name: string;
   code: string;
-  category: CategoryId;
+  category: string;
   price: number;
   ingredients: string;
   story: string;
@@ -18,12 +18,14 @@ export interface Waiter {
   id: string;
   name: string;
   code: string;
+  /** فقط در داده‌های نمونه استفاده می‌شد؛ دیگر از دیتابیس خوانده نمی‌شود. */
   pin: string;
   shift: string;
   ordersCount: number;
   totalSales: number;
   todayOrders: number;
   monthOrders: number;
+  isActive?: boolean;
 }
 
 export interface OrderItem {
@@ -37,12 +39,17 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
+  /** شماره فیش قابل نمایش (از دیتابیس) */
+  number?: number;
+  /** وضعیت خام دیتابیس؛ برای جلوگیری از گم‌شدن معنی ready/cancelled */
+  dbStatus?: string;
   tableNumber: number;
   waiterName: string;
   waiterCode: string;
-  status: 'pending' | 'in_preparation' | 'delivered' | 'paid';
+  status: 'pending' | 'in_preparation' | 'delivered' | 'paid' | 'cancelled';
   time: string;
   date: string;
+  createdAt?: string;
   items: OrderItem[];
   subtotal: number;
   tax: number;
@@ -55,10 +62,11 @@ export interface Order {
 
 export interface TableItem {
   id: number;
+  dbId?: string;
   capacity: number;
   status: 'available' | 'occupied' | 'calling_waiter' | 'in_preparation';
-  section: string;
   activeReceiptId?: string;
+  qrToken?: string;
 }
 
 export interface WaiterCall {
@@ -69,6 +77,8 @@ export interface WaiterCall {
   minutesAgo: number;
   type: 'call_waiter' | 'bill_request' | 'service_refill';
   status: 'pending' | 'accepted' | 'resolved';
+  createdAt?: string;
+  note?: string;
 }
 
 export interface Category {
@@ -78,4 +88,22 @@ export interface Category {
   order: number;
   isActive: boolean;
   itemCount: number;
+}
+
+export interface WaiterSession {
+  token: string;
+  staff: {
+    id: string;
+    name: string;
+    code: string;
+    shift: string;
+  };
+}
+
+export interface CustomerSession {
+  token: string;
+  sessionId: string;
+  tableNumber: number;
+  tableCapacity: number;
+  tableName: string;
 }

@@ -6,7 +6,9 @@ export const WaiterProfileModal: React.FC = () => {
     activeWaiter,
     waiterProfileModalOpen,
     setWaiterProfileModalOpen,
-    toPersianDigits
+    logoutWaiter,
+    toPersianDigits,
+    formatPrice
   } = useApp();
 
   if (!waiterProfileModalOpen) return null;
@@ -53,10 +55,10 @@ export const WaiterProfileModal: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-xl font-bold text-[#002252]">
-                    {activeWaiter ? activeWaiter.name : 'علی رضایی'}
+                    {activeWaiter ? activeWaiter.name : 'مهماندار'}
                   </span>
                   <div className="text-xs text-[#6E6B67] mt-0.5">
-                    کد پرسنلی: {activeWaiter?.code || '۱۰۲۱'} • {activeWaiter?.shift || 'شیفت عصر'}
+                    کد پرسنلی: {activeWaiter ? toPersianDigits(activeWaiter.code) : '-'} • {activeWaiter?.shift || 'شیفت فعال'}
                   </div>
                 </div>
               </div>
@@ -82,7 +84,7 @@ export const WaiterProfileModal: React.FC = () => {
                 <span className="text-xs font-bold text-[#6E6B67]">سفارش‌های امروز</span>
                 <div className="mt-3 flex items-baseline gap-1.5">
                   <span className="text-4xl font-bold text-[#002252] font-mono">
-                    {toPersianDigits(activeWaiter?.todayOrders || 18)}
+                    {toPersianDigits(activeWaiter?.todayOrders ?? 0)}
                   </span>
                   <span className="text-xs text-[#835428] font-bold">سفارش</span>
                 </div>
@@ -92,21 +94,43 @@ export const WaiterProfileModal: React.FC = () => {
                 <span className="text-xs font-bold text-[#6E6B67]">سفارش‌های این ماه</span>
                 <div className="mt-3 flex items-baseline gap-1.5">
                   <span className="text-4xl font-bold text-[#002252] font-mono">
-                    {toPersianDigits(activeWaiter?.monthOrders || 425)}
+                    {toPersianDigits(activeWaiter?.monthOrders ?? 0)}
                   </span>
                   <span className="text-xs text-[#835428] font-bold">سفارش</span>
                 </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#002252] border border-[#00377B] flex items-center justify-between">
+              <span className="text-sm font-bold text-[#FFDCC1]">مجموع فروش ثبت‌شده</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-white font-mono">
+                  {formatPrice(activeWaiter?.totalSales ?? 0)}
+                </span>
+                <span className="text-xs text-[#F8BA84] font-bold">تومان</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Modal Footer */}
-        <div className="p-5 bg-[#FAF2EC] border-t border-[#EADBCE] flex items-center justify-end">
+        <div className="p-5 bg-[#FAF2EC] border-t border-[#EADBCE] flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setWaiterProfileModalOpen(false);
+              void logoutWaiter();
+            }}
+            className="px-4 h-11 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-xl border border-red-200 flex items-center justify-center gap-1.5 transition-colors text-base cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-lg">logout</span>
+            <span>خروج از شیفت</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setWaiterProfileModalOpen(false)}
-            className="w-full sm:w-auto px-6 h-11 bg-white hover:bg-gray-50 text-[#002252] font-bold rounded-xl border border-[#EADBCE] flex items-center justify-center transition-colors text-base cursor-pointer"
+            className="flex-1 sm:flex-none px-6 h-11 bg-white hover:bg-gray-50 text-[#002252] font-bold rounded-xl border border-[#EADBCE] flex items-center justify-center transition-colors text-base cursor-pointer"
           >
             بستن
           </button>

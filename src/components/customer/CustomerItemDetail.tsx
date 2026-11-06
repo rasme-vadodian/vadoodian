@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '../../context/AppContext';
 
 export const CustomerItemDetail: React.FC = () => {
   const {
     products,
+    categories,
+    customerSession,
+    customerCall,
     selectedProductId,
     setCustomerView,
     callWaiter,
@@ -14,11 +17,32 @@ export const CustomerItemDetail: React.FC = () => {
   } = useApp();
 
   const product = products.find((p) => p.id === selectedProductId) || products[0];
+  const categoryName =
+    categories.find((cat) => cat.id === product?.category)?.name || 'منوی عمارت';
 
   const handleCallWaiter = () => {
-    callWaiter(4, 'میز ۴ (شاه‌نشین حیاط)');
-    setCallWaiterModalOpen(true);
+    if (customerCall) {
+      setCallWaiterModalOpen(true);
+      return;
+    }
+    callWaiter(customerSession?.tableNumber ?? 0, customerSession?.tableName);
   };
+
+  if (!product) {
+    return (
+      <div className="w-full max-w-md mx-auto min-h-screen flex flex-col items-center justify-center gap-3 bg-[#FFF8F4] px-6 text-center">
+        <span className="material-symbols-outlined text-4xl text-[#BD8655]">restaurant_menu</span>
+        <p className="text-lg font-bold text-[#002252]">این قلم در منو موجود نیست.</p>
+        <button
+          type="button"
+          onClick={() => setCustomerView('customer_menu')}
+          className="px-5 py-2.5 rounded-xl bg-[#002252] text-white font-bold cursor-pointer"
+        >
+          بازگشت به منو
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#FFF8F4] relative pb-28 select-none">
@@ -50,7 +74,7 @@ export const CustomerItemDetail: React.FC = () => {
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-[#BD8655]/60 text-[#FFDCC1] shadow-sm w-fit">
                 <span className="material-symbols-outlined text-base">local_cafe</span>
                 <span className="font-bold text-xs">
-                  دسته‌بندی: {product.category === 'hot' ? 'نوشیدنی گرم و دمی' : product.category === 'cold' ? 'شربت‌خانه و نوشیدنی سرد' : product.category === 'snack' ? 'میان‌وعده عمارتی' : 'کیک و شیرینی دست‌پخت'}
+                  دسته‌بندی: {categoryName}
                 </span>
               </div>
               <h1 className="text-3xl font-bold text-white leading-tight">
@@ -126,7 +150,7 @@ export const CustomerItemDetail: React.FC = () => {
             notifications_active
           </span>
           <span className="text-xl font-bold tracking-wide">
-            فراخوانی مهماندار
+            {customerCall ? 'درخواست شما در حال بررسی است' : 'فراخوانی مهماندار'}
           </span>
         </button>
       </div>
@@ -146,7 +170,9 @@ export const CustomerItemDetail: React.FC = () => {
             </div>
             <h3 className="text-2xl font-bold text-[#002252]">مهماندار فراخوانده شد</h3>
             <p className="text-base text-[#6E6B67] leading-relaxed">
-              پیام شما ثبت شد. مهماندار عمارت ودودیان تا لحظاتی دیگر جهت ثبت سفارش بر سر میز شما حاضر خواهد شد.
+              {customerCall
+                ? 'درخواست شما ثبت شده و در صف مهمانداران قرار دارد. به‌محض پذیرش، مهماندار بر سر میز حاضر می‌شود.'
+                : 'پیام شما ثبت شد. مهماندار عمارت ودودیان تا لحظاتی دیگر جهت ثبت سفارش بر سر میز شما حاضر خواهد شد.'}
             </p>
             <button
               type="button"

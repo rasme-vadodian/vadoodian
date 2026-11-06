@@ -16,6 +16,8 @@ export const MenuManagement: React.FC = () => {
     deleteTable,
     categoryModalOpen,
     setCategoryModalOpen,
+    tableQrUrl,
+    showToast,
     toPersianDigits,
     formatPrice
   } = useApp();
@@ -76,7 +78,7 @@ export const MenuManagement: React.FC = () => {
             <h1 className="text-3xl font-bold text-[#002252]">مدیریت منو و اقلام</h1>
           </div>
           <p className="text-[#6E6B67] text-base">
-            کنترل لحظه‌ای موجودی اقلام منو، قیمت‌ها، دسته‌بندی‌ها و چیدمان میزهای عمارت
+            کنترل لحظه‌ای موجودی اقلام منو، قیمت‌ها، دسته‌بندی‌ها و میزهای عمارت
           </p>
         </div>
 
@@ -472,7 +474,7 @@ export const MenuManagement: React.FC = () => {
                 <span className="w-2.5 h-2.5 rounded-full bg-[#BD8655]"></span>
                 <h2 className="text-2xl font-bold text-[#002252]">مدیریت و تعریف میزهای سالن</h2>
               </div>
-              <p className="text-sm text-[#6E6B67]">تعریف شماره میزها، ظرفیت و موقعیت سالن</p>
+              <p className="text-sm text-[#6E6B67]">تعریف شماره میزها و ظرفیت</p>
             </div>
           </div>
           <span className="px-3.5 py-1 rounded-full bg-[#FFDCC1] text-[#835428] font-bold text-sm">
@@ -538,8 +540,8 @@ export const MenuManagement: React.FC = () => {
                   <tr className="bg-[#FAF2EC] text-[#6E6B67] text-sm border-b border-[#EADBCE]">
                     <th className="py-2.5 px-3 text-center w-14">شماره</th>
                     <th className="py-2.5 px-3">ظرفیت</th>
-                    <th className="py-2.5 px-3">موقعیت</th>
                     <th className="py-2.5 px-3 text-center">وضعیت</th>
+                    <th className="py-2.5 px-3 text-center">لینک QR</th>
                     <th className="py-2.5 px-3 text-center w-20">عملیات</th>
                   </tr>
                 </thead>
@@ -554,13 +556,43 @@ export const MenuManagement: React.FC = () => {
                       <td className="py-2.5 px-3 font-bold text-[#1E1B18]">
                         {toPersianDigits(tbl.capacity)} نفره
                       </td>
-                      <td className="py-2.5 px-3 text-[#6E6B67] text-sm">
-                        {tbl.section}
-                      </td>
                       <td className="py-2.5 px-3 text-center">
                         <span className="inline-flex items-center gap-1 text-xs text-emerald-800 font-bold">
                           <span className="w-2 h-2 rounded-full bg-emerald-600"></span> فعال
                         </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        {tbl.qrToken ? (
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const url = tableQrUrl(tbl.qrToken!);
+                                void navigator.clipboard
+                                  ?.writeText(url)
+                                  .then(() =>
+                                    showToast('لینک QR کپی شد', `لینک منوی ${tbl.id} در کلیپ‌بورد ذخیره شد.`)
+                                  )
+                                  .catch(() => showToast('کپی ناموفق', `لینک: ${url}`));
+                              }}
+                              className="px-2 py-1 rounded-lg bg-[#FAF2EC] border border-[#EADBCE] text-[#002252] text-xs font-bold hover:bg-[#FFDCC1] cursor-pointer"
+                              title={tableQrUrl(tbl.qrToken)}
+                            >
+                              کپی لینک
+                            </button>
+                            <a
+                              href={`/t/${tbl.qrToken}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#835428] hover:bg-[#FAF2EC]"
+                              title="بازکردن منوی این میز"
+                            >
+                              <span className="material-symbols-outlined text-base">open_in_new</span>
+                            </a>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-[#6E6B67]">—</span>
+                        )}
                       </td>
                       <td className="py-2.5 px-3 text-center">
                         <button
