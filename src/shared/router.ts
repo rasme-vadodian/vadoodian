@@ -29,6 +29,23 @@ export type Route =
   | { name: 'admin-product'; productId: string }
   | { name: 'admin-staff' };
 
+/** پیشوند انتشار (برای GitHub Pages مقدار /vadoodian است)؛ در ریشه خالی است. */
+const BASE_PATH = import.meta.env.BASE_URL.replace(/\/+$/, '');
+
+/** مسیر مرورگر را به مسیر داخلی اپ، بدون پیشوند انتشار، تبدیل می‌کند. */
+const stripBase = (pathname: string): string => {
+  if (!BASE_PATH) return pathname;
+  if (pathname === BASE_PATH) return '/';
+  if (pathname.startsWith(`${BASE_PATH}/`)) return pathname.slice(BASE_PATH.length);
+  return pathname;
+};
+
+/** مسیر داخلی اپ را به مسیر کامل قابل استفاده در History API تبدیل می‌کند. */
+const withBase = (path: string): string => {
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `${BASE_PATH}${normalized}`;
+};
+
 const clean = (path: string) => {
   const withoutQuery = path.split('?')[0].split('#')[0];
   if (withoutQuery.length > 1 && withoutQuery.endsWith('/')) {
@@ -44,7 +61,7 @@ const segments = (path: string) =>
     .map((part) => decodeURIComponent(part));
 
 export function parseRoute(pathname: string): Route {
-  const parts = segments(pathname);
+  const parts = segments(stripBase(pathname));
 
   if (parts.length === 0) return { name: 'home' };
 
@@ -112,16 +129,18 @@ export function routePath(route: Route): string {
 }
 
 export function pushPath(path: string): void {
-  if (window.location.pathname === path) return;
-  window.history.pushState({}, '', path);
+  const target = withBase(path);
+  if (window.location.pathname === target) return;
+  window.history.pushState({}, '', target);
 }
 
 export function replacePath(path: string): void {
-  if (window.location.pathname === path) return;
-  window.history.replaceState({}, '', path);
+  const target = withBase(path);
+  if (window.location.pathname === target) return;
+  window.history.replaceState({}, '', target);
 }
 
 /** لینک کامل QR یک میز؛ برای چاپ یا ساخت QR. */
 export function tableQrUrl(qrToken: string): string {
-  return `${window.location.origin}/t/${qrToken}`;
+  return `${window.location.origin}${withBase(`/t/${qrToken}`)}`;
 }
