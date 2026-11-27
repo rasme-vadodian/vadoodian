@@ -9,3 +9,12 @@ coverage/
 # فقط کلیدهای عمومی لازم برای بیلد (anon key امن است)
 !.env.production
 backups/
+
+# Open Design workspace metadata (created when the folder is used as an
+# Open Design project; not part of the app source)
+.od-frames/
+.od-skills/
+.file-versions/
+.live-artifacts/
+DESIGN-MANIFEST.json
+DESIGN-HANDOFF.md
